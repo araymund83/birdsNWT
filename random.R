@@ -31,11 +31,14 @@ names(meanYearRun$AMCR) <- years
 writeRaster(meanYearRun$ALFL, filename = names(meanYearRun$ALFL), bylayer = TRUE, format = "GTiff")
 
 
-data_df <- na.omit(as.data.frame(r_NDVI_s)) #drop NA
-df <- lapply(meanYearRun, as.data.frame)
+
+densityDT <- lapply(meanYearRun, function(i) as.data.frame(i, xy=TRUE, na.rm=TRUE))
+densityDT <- lapply(meanYearRun, function(i) as.data.frame(i))
+
+valsdensity <- data.table(pixel.ID = 1 :ncell(meanYearRun[[1]]), Years = getValues())
 
 library(data.table)
-dflong <- melt(df$ALFL, id.vars = "Year")
+dflong <- melt(a, id.vars = "Year")
 
 
 dtALFL<-as.data.table(df$ALFL)
@@ -107,4 +110,28 @@ plot(r_diff)
 hist(r_diff)
 
 
-diff <- overlay(meanYearRun[[6]], meanYearRun[[1]])
+diffALFL <- meanYearRun$ALFL[[6]] - meanYearRun$ALFL[[1]]
+hist(diffALFL,
+     col = "springgreen4",
+     main = "Histogram of density model in the NWT",
+     ylab = "Number of pixels")
+mean_val <- cellStats(diffALFL,"mean")
+std_val <- cellStats(diffALFL,"sd")
+
+r_std <- (diffALFL - mean_val)/std_val # standardized image
+
+threshold_val <- c(1.96,1.64)
+plot(r_std)
+
+diff <- calc(meanYearRun, FUN =  function(x){x[[6]] - x[[1]]})
+
+diff <- overlay(meanYearRun$ALFL[[6]], meanYearRun$ALFL[[1]], fun=function(a,b) return(a==b))
+plot(diff,
+     col=c('#FFE4E1','#228B22'),
+     legend=FALSE,
+     axes=FALSE)
+legend("left", legend=c("Agree", "Disagree"),
+       col=c("#228B22", "#FFE4E1"), pch = 15, cex=0.8)
+
+
+

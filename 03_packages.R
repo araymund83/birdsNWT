@@ -34,8 +34,12 @@ CRANpkgs <- c(
   "scam (== 1.2.3)",
   "sf",
   "sp",
+<<<<<<< HEAD
   "tinytex",
   "vegan"
+=======
+  "tinytex"
+>>>>>>> ba9c7a0552441bcd077524cd2e4d5497cb7d1612
 )
 
 if(!require("Require")){install.packages("Require"); library(Require)}
@@ -46,6 +50,10 @@ Require::Require(GHpkgs, require = FALSE)
 Require::Require(CRANpkgs, require = FALSE)
 
 ## don't need to load packages for modules; done automatically but ensure they are installed.
+<<<<<<< HEAD
 SpaDES.install::makeSureAllPackagesInstalled(paths$modulePath)
+=======
+SpaDES.install::makeSureAllPackagesInstalled(paths1$modulePath)
+>>>>>>> ba9c7a0552441bcd077524cd2e4d5497cb7d1612
 
 Require::Require(c("magrittr", "raster", "reproducible", "SpaDES.core", "sf"))

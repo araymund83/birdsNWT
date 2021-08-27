@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ###############################################################################
+=======
+################################################################################
+>>>>>>> ba9c7a0552441bcd077524cd2e4d5497cb7d1612
 ## Initialization parameters and settings
 ################################################################################
 
@@ -10,11 +14,16 @@ cacheDB <- "sqlite" ## default cache backend
 machine <- Sys.info()[["nodename"]]
 user <- Sys.info()[["user"]]
 if (user == "araymundo") {
+<<<<<<< HEAD
   scratchDirRas <- reproducible::checkPath(file.path("~/scratch/birdsNWT"), create = TRUE)
+=======
+  scratchDirRas <- reproducible::checkPath(file.path("~/scratch/WB_LandCoverClass"), create = TRUE)
+>>>>>>> ba9c7a0552441bcd077524cd2e4d5497cb7d1612
   if (grepl(pattern = "spades", x = machine)) {
     system(paste0("chmod -R 777 ", scratchDirRas), wait = TRUE) ## TODO: why? also, too open
   }
   userEmail <- "araymund83@gmail.com"
+<<<<<<< HEAD
 }
 
 
@@ -30,3 +39,6 @@ birdList = c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP", "BAWW", "BBWA", "BBWO", "BC
              "WETA", "WEWP", "WIWA", "WIWR", "WTSP", "WWCR", "YBFL", "YBSA", "YEWA",
              "YRWA")
              
+=======
+}
+>>>>>>> ba9c7a0552441bcd077524cd2e4d5497cb7d1612

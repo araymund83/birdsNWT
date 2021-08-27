@@ -2,6 +2,9 @@
 .Rhistory
 .RData
 .Ruserdata
+<<<<<<< HEAD
 inputs/
 *.tif
 
+=======
+>>>>>>> ba9c7a0552441bcd077524cd2e4d5497cb7d1612
