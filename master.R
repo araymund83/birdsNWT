@@ -1,5 +1,16 @@
 birdList <- c("ALFL", "AMCR", "AMRE")
-climateScenario <- "CanESM2_"
+
+##complete list of species from google drive
+# birdList <- c("ALFL", "AMCR", "AMRE","AMRO","ATSP","BAWW", "BBWA", "BBWO", "BCCH",
+#              "BHCO", "BHVI","BLPW", "BOCH", "BRBL", "BRCR", "BTNW", "CAWA", "CCSP",
+#              "CHSP", "CORA", "COYE", "DEJU", "EAKI", "FOSP", "GRAJ", "HAFL", "HETH",
+#              "HOLA", "LCSP", "LEFL", "LISP", "MAWA", "NOFL", "NOWA", "OCWA", "OVEN",
+#              "PAWA", "PHVI", "PISI", "PIWO", "PUFI", "RBGR", "RBNU", "RCKI", "REVI",
+#              "RUBL", "RUGR", "RWBL", "SAVS", "SOSP", "SWSP", "SWTH", "TEWA" ,"TRES",
+#              "VATH", "WAVI", "WCSP", "WETA", "WEWP", "WIWA", "WIWR", "WTSP", "WWCR",
+#              "YBFL", "YBSA", "YEWA", "YRWA")
+
+climateScenario <- "CanESM2_" #There are other two options for GCM:  CCSM4 and INM-CM4
 year <- paste(c(2011,2100), collapse = "|")
 pathData <- file.path(getwd(), "inputs/predictions")
 
