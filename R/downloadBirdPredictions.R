@@ -9,27 +9,28 @@ downloadBirdPredictions <- function(folderUrl,
   filesToDownload <- Cache(googledrive::drive_ls, path = as_id(folderUrl), ## it only needs the last bit of the https address. 
                            team_drive = as_id(folderUrl))
   
-  modelsForBirdList <- filesToDownload$name[grepl(pattern = paste(birdsList, collapse = "|"), 
+  predictionsForBirdList <- filesToDownload$name[grepl(pattern = paste(birdsList, collapse = "|"), 
                                                   x = filesToDownload$name)]
-  if (length(modelsForBirdList) == 0){
+  if (length(predictionsForBirdList) == 0){
     message(crayon::red(paste0("No prediction available for ", birdsList, 
-                               " for models V", climateScenario)))
+                               "for GCM :", climateScenario)))
     return(NA)
   }
-  #browser()
-  downloadedModels <- lapply(X = modelsForBirdList, FUN = function(modelFile){
-    if (!file.exists(file.path(dataPath, modelFile))){
-      googledrive::drive_download(file = as_id(filesToDownload[filesToDownload$name %in% modelFile, ]$id), #modelFile,
-                                  path = file.path(dataPath, modelFile), overwrite = TRUE)
+  browser()
+  downloadedPredictions <- lapply(X = predictionsForBirdList, FUN = function(rasterFile){
+    if (!file.exists(file.path(dataPath, rasterFile))){
+      googledrive::drive_download(file = as_id(filesToDownload[filesToDownload$name %in% rasterFile, ]$id), #modelFile,
+                                  path = file.path(dataPath, rasterFile), 
+                                  overwrite = TRUE)
     }
     if(returnPath){
-      return(file.path(dataPath, modelFile))
+      return(file.path(dataPath, rasterFile))
     }else {
-      return(get(load(file.path(dataPath, modelFile))))
+      return(get(load(file.path(dataPath, rasterFile))))
     }
     
   })
-  names(downloadedModels) <- birdsList
+  names(downloadedPredictions) <- birdsList
   
-  return(downloadedModels)
+  return(downloadedPredictions)
 }
