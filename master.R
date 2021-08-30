@@ -20,8 +20,14 @@ birdPredictions <- downloadBirdPredictions(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIk
                                            birdsList = paste(birdList, collapse = "|"),
                                            yearAnalysis = paste(c(2011, 2100), collapse = "|"),
                                            #climateScenario = "CanESM2",
-                                           dataPath = paths$inputPath,
-                                           returnPath = TRUE)
+                                           dataPath = pathData
+                                           )
+birdPredictions <- downloadPredRas(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c",
+                                           birdsList = paste(birdList, collapse = "|"),
+                                           #yearAnalysis = paste(c(2011, 2100), collapse = "|"),
+                                           #climateScenario = "CanESM2",
+                                           rastersPath =pathData
+                                           )
 
 predStack <- loadBirdPredictions(birdList = birdList,
                                     pathData = pathData,

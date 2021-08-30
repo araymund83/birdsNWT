@@ -5,7 +5,7 @@
 
 ##get mean values per species/run/year
 years <- c(2011, 2031, 2051, 2071, 2091, 2100)
-meanRun <- lapply(predStack, FUN = function(predstack, Years = years){ 
+meanValuesTime <- lapply(predStack, FUN = function(predstack, Years = years){ 
    yearStack <- lapply(Years, FUN = function(year, birds = predstack){
    # browser()
     oneRep <- grep(pattern = paste0("*", year), x = names(birds))
@@ -21,6 +21,8 @@ meanRun <- lapply(predStack, FUN = function(predstack, Years = years){
 )
 
 
+
+
 names(meanRun) <- birdList
 
 meanYearRun <- lapply(meanRun, stack)
@@ -32,8 +34,8 @@ writeRaster(meanYearRun$ALFL, filename = names(meanYearRun$ALFL), bylayer = TRUE
 
 
 
-densityDT <- lapply(meanYearRun, function(i) as.data.frame(i, xy=TRUE, na.rm=TRUE))
-densityDT <- lapply(meanYearRun, function(i) as.data.frame(i))
+densityDT <- lapply(meanValuesTime[[]], function(i) as.data.frame(i, xy=TRUE, na.rm=TRUE))
+densityDT <- lapply(meanValuesTime, function(i) as.data.frame(i))
 
 valsdensity <- data.table(pixel.ID = 1 :ncell(meanYearRun[[1]]), Years = getValues())
 
@@ -134,4 +136,6 @@ legend("left", legend=c("Agree", "Disagree"),
        col=c("#228B22", "#FFE4E1"), pch = 15, cex=0.8)
 
 
+
+cellValues 
 
