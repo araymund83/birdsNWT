@@ -12,6 +12,9 @@ loadPredRas <- function(birdsList,
                                        rastersPath = rastersPath)
   
   
+  stack <- lapply(X = downloadedRasters, FUN = function(RasterLayer){
+    stack
+  })
   
   
   

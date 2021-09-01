@@ -1,4 +1,5 @@
-birdList <- c("ALFL", "AMCR", "AMRE")
+#birdList <- c("ALFL", "AMCR", "AMRE")
+birdList <- c("AMRO","ATSP","BAWW")
 
 ##complete list of species from google drive
 # birdList <- c("ALFL", "AMCR", "AMRE","AMRO","ATSP","BAWW", "BBWA", "BBWO", "BCCH",
@@ -19,19 +20,21 @@ pathData <- file.path(getwd(), "inputs/predictions")
 birdPredictions <- downloadBirdPredictions(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c",
                                            birdsList = paste(birdList, collapse = "|"),
                                            yearAnalysis = paste(c(2011, 2100), collapse = "|"),
-                                           #climateScenario = "CanESM2",
+                                           climateScenario = "CanESM2",
                                            dataPath = pathData
                                            )
-birdPredictions <- downloadPredRas(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c",
-                                           birdsList = paste(birdList, collapse = "|"),
-                                           #yearAnalysis = paste(c(2011, 2100), collapse = "|"),
-                                           #climateScenario = "CanESM2",
-                                           rastersPath =pathData
-                                           )
+# birdPredictions <- downloadPredRas(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c",
+#                                            birdsList = paste(birdList, collapse = "|"),
+#                                            #yearAnalysis = paste(c(2011, 2100), collapse = "|"),
+#                                            #climateScenario = "CanESM2",
+#                                            rastersPath =pathData
+#                                            )
 
 predStack <- loadBirdPredictions(birdList = birdList,
                                     pathData = pathData,
                                     climateScenario = "CanESM2_",
                                     year = year)
+
+
 
 

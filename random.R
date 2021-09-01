@@ -7,9 +7,9 @@
 years <- c(2011, 2031, 2051, 2071, 2091, 2100)
 meanValuesTime <- lapply(predStack, FUN = function(predstack, Years = years){ 
    yearStack <- lapply(Years, FUN = function(year, birds = predstack){
-   # browser()
+   #browser()
     oneRep <- grep(pattern = paste0("*", year), x = names(birds))
-    #subset the raster
+    #subset the raster per each of the spp and run 
     runStack <- birds[[oneRep]]
     mean_ras <- raster::calc(runStack, fun = mean, na.rm = TRUE)
     return(mean_ras)
@@ -20,18 +20,65 @@ meanValuesTime <- lapply(predStack, FUN = function(predstack, Years = years){
 }
 )
 
+##stack all years per species
+meanYearRun <- lapply(meanValuesTime, stack)
+
+### change Rasterlayers names 
+changeName <-lapply(names(meanYearRun), function(bird){
+  name <- paste0("mean", climateScenario, bird)
+  names(meanYearRun)[] <- gsub(pattern ="X", 
+                               replacement = "mean_CanESM2_",bird, names(meanYearRun)[])
+})
+
+#TODO: HOW TO CHANGE THE NAMES IN A FUNCTION?? 
+names(meanYearRun$ALFL) <- gsub(pattern ="X", replacement = paste0("mean","CanESM2_ALF"), names(meanYearRun$ALFL))
+names(meanYearRun$AMCR) <- gsub(pattern ="X", replacement = "mean_CanESM2_AMCR", names(meanYearRun$AMCR))
+names(meanYearRun$AMRE) <- gsub(pattern ="X", replacement = "mean_CanESM2_AMRE", names(meanYearRun$AMRE))
+
+
+##write rasterStacks into the outputs path 
+saveRasters <- lapply(meanYearRun, function(x) {
+  writeRaster(x,  filename = file.path(getwd(),"outputs","mean"), 
+              names(x), 
+              bylayer = TRUE, format = "GTiff")
+})
+
+plotmeanRasters <- lapply(meanYearRun, function(x){
+  meanPlotsTime <-plot(x)[]
+})
+
+# ##WRITE A SINGLE RASTERLAYERS
+# writeRaster(meanYearRun$ALFL, file.path(getwd(),"outputs",climateScenario), 
+#             names(meanYearRun$ALFL), 
+#             bylayer = TRUE, format = "GTiff")
+
+##TODO: CREATE DATA TABLE WITH THE MEAN VALUES PER YEAR PER SPECIES ????
+##create DF of all species
+meanDF <- lapply(meanYearRun, as.data.frame)
+
+##conver to data.table
+dt <- lapply(meanDF, as.data.table)
+
+
+##create a column ID (pixelID) for each of the bird species
+dt <- lapply(dt, function(x)
+  cbind(x, pixelID = 1:nrow(x)))
+
+## 
+dtLong <- melt (data = dt,
+                id.vars ="pixelID",
+                variable.name = "Year",
+                value.name = "Mean_density")
 
 
 
-names(meanRun) <- birdList
+pixelID <- 1:ncell(meanYearRun[[1]])
 
-meanYearRun <- lapply(meanRun, stack)
-#rename each layer within the stack with each simulation year 
-names(meanYearRun$ALFL) <- years
-names(meanYearRun$AMCR) <- years
-#save rasters 
-writeRaster(meanYearRun$ALFL, filename = names(meanYearRun$ALFL), bylayer = TRUE, format = "GTiff")
 
+
+
+
+allPredictions <- list.files(pathData, pattern = glob2rx( "CanESM2_*.tif$"), full.names = TRUE)
 
 
 densityDT <- lapply(meanValuesTime[[]], function(i) as.data.frame(i, xy=TRUE, na.rm=TRUE))
@@ -40,13 +87,12 @@ densityDT <- lapply(meanValuesTime, function(i) as.data.frame(i))
 valsdensity <- data.table(pixel.ID = 1 :ncell(meanYearRun[[1]]), Years = getValues())
 
 library(data.table)
-dflong <- melt(a, id.vars = "Year")
+dflong <- melt(df, id.vars = "Year")
 
 
-dtALFL<-as.data.table(df$ALFL)
 ## transform to long format 
 
-dtLong = melt(dtALFL, measure.vars = c("X2011", "X2031", "X2051", "X2071","X2091","X2100"),
+dtLong = melt(dt, measure.vars = names(meanDF),
              variable.name = "year", value.name = "density")
 
 d<- dtLong[, lapply(.SD, mean, na.omit = TRUE), by = "year"]
@@ -54,7 +100,6 @@ d<- dtLong[, lapply(.SD, mean, na.omit = TRUE), by = "year"]
 nan <- sum(is.nan(dtLong))
 ### make the plot 
 library(ggplot2)
-plotALFL<- ggplot(dtLong,aes(x=year,y=density)) + geom_line()
 
 runStack2 <- lapply(meanRun,stack)
 plotStack<- lapply (out, stack)
@@ -63,49 +108,13 @@ plots <- lapply(plotStack, FUN = function(n){
   }
   )
 
-a <- retrieveRasters(dataFolder = pathData, 
-                     years = c(2011, 2100),
-                     patternsToRetrieveRasters = "CanESM2",
-                     species = birdList)
-                     #species = paste(birdList, collapse = "|"))
-
-
-raster_stats <- lapply(predStack, FUN = function)
 
 
 
-allFiles <- grepMulti(x = list.files(path = dataFolder[[eachScenario]][[bmod]][[run]],
-                                     full.names = TRUE),
-                      patterns = patternsToRetrieveRasters)
-filesPath <- grepMulti(x = allFiles, patterns = c(sp, paste(years, collapse = "|")))
-rastersTS <- raster::stack(lapply(X = years, FUN = function(eachTS){
-  rasPath <- grepMulti(x = filesPath, patterns = eachTS)
-  if (length(rasPath) == 0)
-    stop("At least one of the rasters doesn't seem to exist for the year sequence provided. Please check your data")
-  ras <- raster::raster(rasPath)
-  names(ras) <- paste(eachScenario, bmod, run, eachTS, sep = "_")
-  return(ras)
-})
-
-### This function allow me to read the rasters 
-
-dir.files <- list.dirs(path =pathData, recursive = FALSE)
-names(dir.files) <- basename(dir.files)
-dir.files
-data.files <- lapply(dir.files, list.files)
-
-raster_stack <- lapply(predictions, function(ras){
-  rasters <- stack(list.files(pathData, pattern = climateScenario,
-                              full.names = TRUE, recursive = FALSE))
-})
-
-stkNames <- unlist(lapply(X= 1:length(predStack@layers), FUN = function(layers){
-  layer <- predStack@layers[[layers]]@data@names
-  returr(layers)
-}))
 
 
-r_diff <- meanYearRun$ALFL$X2100- meanYearRun$ALFL$X2011
+
+r_diff <- meanValuesTime$ALFL$X2100- meanValuesTime$ALFL$X2011
 names(r_diff) <- "Difference"
 plot(r_diff)
 
@@ -125,7 +134,9 @@ r_std <- (diffALFL - mean_val)/std_val # standardized image
 threshold_val <- c(1.96,1.64)
 plot(r_std)
 
-diff <- calc(meanYearRun, FUN =  function(x){x[[6]] - x[[1]]})
+
+##TODO: is this most efficient than the code above?? 
+diff <- calc(meanYearRun, FUN =  function(x){x[[6]] - x[[1]]}) 
 
 diff <- overlay(meanYearRun$ALFL[[6]], meanYearRun$ALFL[[1]], fun=function(a,b) return(a==b))
 plot(diff,
@@ -135,7 +146,4 @@ plot(diff,
 legend("left", legend=c("Agree", "Disagree"),
        col=c("#228B22", "#FFE4E1"), pch = 15, cex=0.8)
 
-
-
-cellValues 
 
