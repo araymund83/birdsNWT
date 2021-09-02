@@ -1,5 +1,5 @@
-#birdList <- c("ALFL", "AMCR", "AMRE")
-birdList <- c("AMRO","ATSP","BAWW")
+birdList <- c("ALFL", "AMCR", "AMRE")
+#birdList <- c("AMRO","ATSP","BAWW")
 
 ##complete list of species from google drive
 # birdList <- c("ALFL", "AMCR", "AMRE","AMRO","ATSP","BAWW", "BBWA", "BBWO", "BCCH",

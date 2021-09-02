@@ -5,13 +5,16 @@
 
 ##get mean values per species/run/year
 years <- c(2011, 2031, 2051, 2071, 2091, 2100)
-meanValuesTime <- lapply(predStack, FUN = function(predstack, Years = years){ 
+meanValuesTime2 <- lapply(predStack, FUN = function(predstack, Years = years){ 
    yearStack <- lapply(Years, FUN = function(year, birds = predstack){
    #browser()
     oneRep <- grep(pattern = paste0("*", year), x = names(birds))
     #subset the raster per each of the spp and run 
     runStack <- birds[[oneRep]]
     mean_ras <- raster::calc(runStack, fun = mean, na.rm = TRUE)
+    #browser()
+    #sd_ras <- raster::calc(runStack, fun = sd)
+    #return(list(mean = mean_ras, sd = sd_ras))
     return(mean_ras)
   })
  # browser()
@@ -20,8 +23,62 @@ meanValuesTime <- lapply(predStack, FUN = function(predstack, Years = years){
 }
 )
 
+###Error in h(simpleError(msg, call)) : 
+###error in evaluating the argument 'x' in selecting a method for function 'raster': list has no "x" 
+
 ##stack all years per species
-meanYearRun <- lapply(meanValuesTime, stack)
+meanYearRun <- lapply(X = meanValuesTime,  FUN = function(ras){
+  meanSdStack <- raster(stack(ras)[])
+  return(meanSdStack)
+})
+
+
+ meanYearRun2 <- lapply(meanValuesTime2, stack)
+
+ #### make a data table per species 
+dtSp <- lapply(X = meanYearRun2, FUN = function(sp){
+  browser()
+  dtEachSp <- data.table(pixelID = 1:ncell(sp), getValues(sp))
+  dtEachSp <- na.omit(dtEachSp)
+  return(dtEachSp)
+})
+
+
+### fit a linear regression model to calculate the trend in each of the pixels
+  
+dtSP <- lapply(X = meanYearRun2, FUN = function(sp){
+  arrayStack <- raster::as.array(x = sp)
+  times <- c(2011, 2041, 2061)
+  slopeValues <- apply(X = arrayStack, MARGIN = c(1, 2), FUN = function(x){
+    slpCoef <- RcppArmadillo::fastLmPure(X = cbind(1, times), y = x) # Original formula was way slower: lm(x ~ times, data = dfX, na.action = na.omit)
+    coef <- slpCoef$coefficients[2]
+    pVal <- 2*pt(abs(slpCoef$coefficients/slpCoef$stderr), slpCoef$df.residual, lower.tail=FALSE)[2]
+    return(list(coef = coef, pVal = pVal))
+  }
+  )
+})
+  slopeCoefficientVals <- matrix(unlist(lapply(slopeValues, [[, 1)),
+                                 nrow = nrow(arrayStack),
+                                 ncol = ncol(arrayStack),
+                                 byrow = FALSE) # retrieves values from slope Coefficient, arranges into a corrected (inversed) matrix
+  slopeSignificancyVals <- matrix(unlist(lapply(slopeValues, [[, 2)),
+                                  nrow = nrow(arrayStack),
+                                  ncol = ncol(arrayStack),
+                                  byrow = FALSE) # retrieves values from slope Coefficient, arranges into a corrected (inversed) matrix
+  slopeCoeff <- sp[[1]] %>%
+    raster::setValues(slopeCoefficientVals)
+  names(slopeCoeff) <- "slopeCoeff"
+  
+  slopeSignificancy <- sp[[1]] %>%
+    raster::setValues(slopeSignificancyVals)
+  names(slopeSignificancy) <- "slopeSignificancy"
+  return(list(slopeCoefficient = slopeCoeff, slopeSignificancy = slopeSignificancy))
+  })
+
+
+
+
+
 
 ### change Rasterlayers names 
 changeName <-lapply(names(meanYearRun), function(bird){
@@ -43,7 +100,7 @@ saveRasters <- lapply(meanYearRun, function(x) {
               bylayer = TRUE, format = "GTiff")
 })
 
-plotmeanRasters <- lapply(meanYearRun, function(x){
+plotmeanRasters <- lapply(meanYearRun2, function(x){
   meanPlotsTime <-plot(x)[]
 })
 
@@ -58,13 +115,14 @@ meanDF <- lapply(meanYearRun, as.data.frame)
 
 ##conver to data.table
 dt <- lapply(meanDF, as.data.table)
+dt <- lapply(meanYearRun)
 
 
 ##create a column ID (pixelID) for each of the bird species
 dt <- lapply(dt, function(x)
   cbind(x, pixelID = 1:nrow(x)))
 
-## 
+##  HOW TO APPLY TO ALL THE DT in my list ????
 dtLong <- melt (data = dt,
                 id.vars ="pixelID",
                 variable.name = "Year",
@@ -72,32 +130,14 @@ dtLong <- melt (data = dt,
 
 
 
-pixelID <- 1:ncell(meanYearRun[[1]])
 
 
 
 
 
-allPredictions <- list.files(pathData, pattern = glob2rx( "CanESM2_*.tif$"), full.names = TRUE)
 
 
-densityDT <- lapply(meanValuesTime[[]], function(i) as.data.frame(i, xy=TRUE, na.rm=TRUE))
-densityDT <- lapply(meanValuesTime, function(i) as.data.frame(i))
 
-valsdensity <- data.table(pixel.ID = 1 :ncell(meanYearRun[[1]]), Years = getValues())
-
-library(data.table)
-dflong <- melt(df, id.vars = "Year")
-
-
-## transform to long format 
-
-dtLong = melt(dt, measure.vars = names(meanDF),
-             variable.name = "year", value.name = "density")
-
-d<- dtLong[, lapply(.SD, mean, na.omit = TRUE), by = "year"]
-
-nan <- sum(is.nan(dtLong))
 ### make the plot 
 library(ggplot2)
 
