@@ -1,4 +1,9 @@
 birdList <- c("ALFL", "AMCR", "AMRE")
+
+library(pacman)
+pacman::p_load(raster, rgdal, rgeos, readxl, stringr, sf, tidyverse, terra, foreach, fs)
+
+
 #birdList <- c("AMRO","ATSP","BAWW")
 
 ##complete list of species from google drive
@@ -35,6 +40,9 @@ predStack <- loadBirdPredictions(birdList = birdList,
                                     climateScenario = "CanESM2_",
                                     year = year)
 
+
+# Apply the function -----------------------------------------------------
+map(spcs, make_average_reps) #Esto aplicara la funcion para todas las especies              
 
 
 

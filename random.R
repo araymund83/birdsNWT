@@ -55,8 +55,7 @@ dtSP <- lapply(X = meanYearRun2, FUN = function(sp){
     pVal <- 2*pt(abs(slpCoef$coefficients/slpCoef$stderr), slpCoef$df.residual, lower.tail=FALSE)[2]
     return(list(coef = coef, pVal = pVal))
   }
-  )
-})
+
   slopeCoefficientVals <- matrix(unlist(lapply(slopeValues, [[, 1)),
                                  nrow = nrow(arrayStack),
                                  ncol = ncol(arrayStack),
