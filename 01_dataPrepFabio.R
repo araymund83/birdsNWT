@@ -2,7 +2,7 @@
 library(pacman)
 
 pacman::p_load(glue, raster, rgdal, rgeos, readxl, stringr, sf, 
-               tidyverse, terra, foreach, fs, future.apply, furrr, fst, compiler)
+               tidyverse, terra, foreach, fs, future.apply, furrr, fst, glue, compiler)
 
 rm(list = ls())
 
@@ -15,7 +15,7 @@ print(spcs)
 
 # Making an example for one specie ----------------------------
 make_average_reps <- function(sp){
-  # sp <- spcs[1]
+  # sp <- spcs[4]
   cat('Start\n')
   fls <- fs::dir_ls(sp) #lista archivos
   dir <- sp # directorio de trabajo
@@ -62,4 +62,4 @@ make_average_reps <- function(sp){
 
 
 # Apply the function -----------------------------------------------------
-map(spcs, make_average_reps)
+map(spcs[55], make_average_reps)

@@ -29,10 +29,5 @@ downloadPredRas <- function(folderUrl,
       }
     )
   
-  #get the species codes as names for the downloadedRasters object, rather than using the whole filepath
-  X <-
-    lapply(rastersForBirdList) #works for strings of the form "varsXXXX" or "meanXXXX"
-  names(downloadedRasters) <- X
-  #the downloadBirdDensityRasters function returns/loads the downloaded rasters
-  return(downloadedRasters)
+return(downloadedRasters)
 }

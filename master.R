@@ -1,4 +1,4 @@
-birdList <- c("ALFL", "AMCR", "AMRE")
+birdList <- c("VATH")
 
 library(pacman)
 pacman::p_load(raster, rgdal, rgeos, readxl, stringr, sf, tidyverse, terra, foreach, fs)
@@ -16,7 +16,7 @@ pacman::p_load(raster, rgdal, rgeos, readxl, stringr, sf, tidyverse, terra, fore
 #              "VATH", "WAVI", "WCSP", "WETA", "WEWP", "WIWA", "WIWR", "WTSP", "WWCR",
 #              "YBFL", "YBSA", "YEWA", "YRWA")
 
-climateScenario <- "CanESM2_" #There are other two options for GCM:  CCSM4 and INM-CM4
+climateScenario <- "INM-CM4"  #There are other two options for GCM:  CCSM4 and INM-CM4
 year <- paste(c(2011,2100), collapse = "|")
 pathData <- file.path(getwd(), "inputs/predictions")
 
@@ -25,15 +25,15 @@ pathData <- file.path(getwd(), "inputs/predictions")
 birdPredictions <- downloadBirdPredictions(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c",
                                            birdsList = paste(birdList, collapse = "|"),
                                            yearAnalysis = paste(c(2011, 2100), collapse = "|"),
-                                           climateScenario = "CanESM2",
+                                           #climateScenario = "CanESM2",
                                            dataPath = pathData
                                            )
-# birdPredictions <- downloadPredRas(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c",
-#                                            birdsList = paste(birdList, collapse = "|"),
-#                                            #yearAnalysis = paste(c(2011, 2100), collapse = "|"),
-#                                            #climateScenario = "CanESM2",
-#                                            rastersPath =pathData
-#                                            )
+ birdPredictions <- downloadPredRas(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c",
+                                           birdsList = paste(birdList, collapse = "|"),
+                                           #yearAnalysis = paste(c(2011, 2100), collapse = "|"),
+                                           #climateScenario = "CanESM2",
+                                          rastersPath =pathData
+                                            )
 
 predStack <- loadBirdPredictions(birdList = birdList,
                                     pathData = pathData,
