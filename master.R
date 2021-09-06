@@ -1,4 +1,4 @@
-birdList <- c("VATH")
+birdList <- c("AMRO")
 
 library(pacman)
 pacman::p_load(raster, rgdal, rgeos, readxl, stringr, sf, tidyverse, terra, foreach, fs)
@@ -28,7 +28,7 @@ birdPredictions <- downloadBirdPredictions(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIk
                                            #climateScenario = "CanESM2",
                                            dataPath = pathData
                                            )
- birdPredictions <- downloadPredRas(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c",
+birdPredictions <- downloadPredRas(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c",
                                            birdsList = paste(birdList, collapse = "|"),
                                            #yearAnalysis = paste(c(2011, 2100), collapse = "|"),
                                            #climateScenario = "CanESM2",
@@ -42,7 +42,8 @@ predStack <- loadBirdPredictions(birdList = birdList,
 
 
 # Apply the function -----------------------------------------------------
-map(spcs, make_average_reps) #Esto aplicara la funcion para todas las especies              
+map(spcs, make_average_reps) #Esto aplicara la funcion para todas las especies   
+map(.x = spcs, .f = see_changes)
 
 
 
