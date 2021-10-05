@@ -1,0 +1,74 @@
+
+# Load libraries ----------------------------------------------------------
+require(pacman)
+pacman::p_load(raster, rgdal, rgeos, future, furrr, reproducible, RColorBrewer, 
+               colorspace, ggspatial, ggpubr, gridExtra, terra, stringr, glue, 
+               sf, tidyverse, RStoolbox, fs, future.apply, fst, trend)
+
+
+require(pacman)
+pacman::p_load(caTools, colorspace,compiler, furrr, future, future.apply, fs, fst, ggpubr, ggspatial, glue, gridExtra,
+               RColorBrewer, raster, rgdal, rgeos, RStoolbox, sf, stringr, terra, tidyverse, trend)
+
+g <- gc(reset = TRUE)
+rm(list = ls())
+options(scipen = 999)
+
+# Load data ---------------------------------------------------------------
+root <- './inputs/predictions'
+spcs <- dir_ls(root)
+
+# Function ----------------------------------------------------------------
+get_sum_population <- function(spc){
+  
+  cat('To start\n', spc)
+  fls <- dir_ls(spc, regexp = '.tif$')
+  
+  cat('To get the name of each gcm\n')
+  gcm <- str_split(basename(fls), '_')
+  gcm <- sapply(gcm, function(x) x[1])
+  gcm <- unique(gcm)
+  prd <- str_sub(string = basename(fls), start = nchar(basename(fls)) - 7, end = nchar(basename(fls)) - 4)
+  prd <- unique(prd)
+  
+  pop <- map(.x = 1:length(gcm), .f = function(i){
+    rsl <- map(.x = 1:length(prd), .f = function(j){
+      cat('Start ', gcm[i], ' ', prd[j], '\n')
+      stk <- grep(gcm[i], fls, value = TRUE) %>% 
+        grep(prd[j], ., value = TRUE) %>% 
+        as.character() %>% 
+        stack()
+      cls <- cellStats(stk, 'sum')
+      cls <- as.data.frame(cls)
+      cls <- mutate(cls, model = gcm[i], period = prd[j], specie = basename(spc), run = 1:5)
+      cls <- dplyr::select(cls, specie, model, period, run, sum_pop = cls)
+      cat('Done sum pop\n')
+      return(cls)
+    })
+    return(rsl)
+  })
+  
+  po2 <- flatten(pop)
+  po2 <- bind_rows(po2)
+  rownames(po2) <- 1:nrow(po2)
+  glue('./outputs/rds/sum_pop_{basename(spc)}.rds')
+  saveRDS(object = po2, file = glue('./outputs/rds/sum_pop_{basename(spc)}.rds'))
+  
+  cat('Done\n')
+  
+}
+
+
+# Apply the function ------------------------------------------------------
+map(spcs[40], get_sum_population)
+
+YRWA <- readRDS('outputs/rds/sum_pop_YRWA.rds')
+
+# Make line graph  ------------------------------------------------------
+
+# Selección de colores
+cols <- c("#D43F3A", "#EEA236", "#5CB85C", "#46B8DA", "#9632B8")
+
+a<- ggplot(YRWA, aes(x = period, y = sum_pop, color = model)) + 
+     geom_line(linetype = 3, lwd =2.1) +
+     scale_color_manual(values = cols)
