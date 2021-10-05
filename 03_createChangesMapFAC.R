@@ -12,17 +12,17 @@ root <- './outputs'
 dirs <- fs::dir_ls(root, type = 'directory')
 spcs <- basename(dirs)
 limt <- sf::st_read('inputs/bcr6_NTYU/bcr6NTYU.shp') 
-ecrg <- sf::st_read('inputs/Ecoprovinces/ecoprovinces.shp') # TODO: ADD ECODISTRICTS 
+ecpr <- sf::st_read('inputs/ecoregions/ecoregions.shp') # TODO: ADD ECOprovicnes
 
 targetCRS <- paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
                    "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")
 
 # Extract by mask for the ecoregions ---------------------------------------
-plot(st_geometry(ecrg))
-ecrg <- sf::st_transform(x = ecrg, crs = st_crs(limt))
+plot(st_geometry(ecpr))
+ecpr <- sf::st_transform(x = ecpr, crs = st_crs(limt))
 limt <- sf::st_transform(x = limt, crs = targetCRS)
-ecrg_limt <- sf::st_intersection(x = ecrg, y = limt)
-plot(st_geometry(ecrg_limt))
+ecpr_limt <- sf::st_intersection(x = ecpr, y = limt)
+plot(st_geometry(ecpr_limt))
 
 # Function to use ---------------------------------------------------------
 see_changes <- function(spc){
@@ -54,7 +54,7 @@ see_changes <- function(spc){
   gavg <- ggplot() + 
     geom_tile(data = tbl, aes(x = lon, y = lat, fill = avg)) + 
     geom_sf(data = limt, fill = NA, col = 'grey') +
-    #geom_sf(data = ecrg_limt, fill = NA) +
+    #geom_sf(data = ecpr_limt, fill = NA) +
     coord_sf() + 
     facet_wrap(.~gc, nrow = 1, ncol = 3) +
     # scale_fill_gradientn(colors = RColorBrewer::brewer.pal(n = 8, name = 'YlOrBr')) + 
@@ -77,9 +77,9 @@ znl <- map(.x = 1:length(rst.avg), .f = function(k){
   
   cat('To start\n')
   cat(k, '\n')
-  znl <- exact_extract(rst.avg[[k]], ecrg_limt, c('mean', 'stdev'))
+  znl <- exact_extract(rst.avg[[k]], ecpr_limt, c('mean', 'stdev'))
   znl <- round(znl, digits = 2)
-  znl <- mutate(znl, gcm = gcm[k], ecoprovince = ecrg_limt$ECOPROVINC)
+  znl <- mutate(znl, gcm = gcm[k], ecoprovince = ecpr_limt$ECOPROVINC)
   cat('Done\n')
   return(znl)
   

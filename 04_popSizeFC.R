@@ -12,7 +12,7 @@ rm(list = ls())
 root <- './inputs/predictions'
 dirs <- fs::dir_ls(root, type = 'directory')
 spcs <- basename(dirs)
-limt <- sf::st_read('.shp') ## TODO: PUT NAME SHAPEFILE
+limt <- sf::st_read("./inputs/bcr6_NTYU/bcr6_NTYU.shp") ## TODO: PUT NAME SHAPEFILE
 targetCRS <-  paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
                     "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")
 limt <- st_transform(x = limt, targetCRS)
@@ -68,7 +68,7 @@ make_sum <- function(spc){
 
 # Apply the function to make the sum --------------------------------------
 make_sum(spc = spcs[2])
-map(.x = spcs[2:length(spcs)], .f = make_sum)
+map(.x = spcs[43:length(spcs)], .f = make_sum)
 
 # To make the maps --------------------------------------------------------
 
@@ -154,4 +154,3 @@ make_maps <- function(spc){
 
 
 
-© 2021 GitHub, Inc.
