@@ -5,6 +5,7 @@ pacman::p_load(caTools, colorspace,compiler, furrr, future, future.apply, fs, fs
 
 g <- gc(reset = TRUE)
 rm(list = ls())
+options(scipen = 999)
 
 # Load data ---------------------------------------------------------------
 root <- './inputs/predictions'
@@ -47,3 +48,6 @@ saveRDS(object = alfl, './outputs/rds/alfl_qntl.rds')
 rsl <- map(.x = spcs, .f = get_extreme_values)
 rsl <- bind_rows(rsl)
 saveRDS(object = rsl, file = './outputs/rds/all_qntl.rds')
+
+rsl <- readRDS(file = './outputs/rds/all_qntl.rds')
+rsl <- mutate(rsl, intervals = round(intervals, digits = 3))
