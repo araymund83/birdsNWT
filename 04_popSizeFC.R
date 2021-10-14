@@ -1,9 +1,8 @@
 
 # Load libraries ----------------------------------------------------------
 require(pacman)
-pacman::p_load(raster, rgdal, rgeos, future, furrr, reproducible, RColorBrewer, 
-               colorspace, ggspatial, ggpubr, gridExtra, terra, stringr, glue, 
-               sf, tidyverse, RStoolbox, fs, future.apply, fst, trend)
+pacman::p_load(colorspace, furrr, future, future.apply, fs, fst, ggpubr, ggspatial, glue, gridExtra,
+               RColorBrewer, raster, rgdal, rgeos, RStoolbox, sf, stringr, terra, tidyverse, trend  )
 
 g <- gc(reset = TRUE)
 rm(list = ls())
@@ -67,7 +66,7 @@ make_sum <- function(spc){
 }
 
 # Apply the function to make the sum --------------------------------------
-make_sum(spc = spcs[2])
+#make_sum(spc = spcs[2])
 map(.x = spcs[43:length(spcs)], .f = make_sum)
 
 # To make the maps --------------------------------------------------------
@@ -77,7 +76,7 @@ spcs <- fs::dir_ls(fldr, type = 'directory')
 
 make_maps <- function(spc){
   
-  spc <- spcs[1] # Run and comment
+  #spc <- spcs[1] # Run and comment
   
   fld <- grep(spc, spcs, value = TRUE)
   fls <- list.files(fld, full.names = TRUE, pattern = '.tif')
@@ -89,7 +88,7 @@ make_maps <- function(spc){
   
   map(.x = 1:length(gcm), .f = function(i){
     
-    i <- 1 # Run and comment
+   # i <- 1 # Run and comment
     
     # Start reading the rasters
     fle <- grep(gcm[i], fls, value = TRUE)
@@ -118,7 +117,7 @@ make_maps <- function(spc){
     ggp.sum <- ggplot() + 
       geom_tile(data = tbl.sum, aes(x = x, y = y, fill = value)) +
       facet_wrap(.~ year) +
-      scale_fill_gradientn(colors = brewer.pal(name = 'PiYG', n = 5)) +
+      scale_fill_gradient(colors = brewer.pal(name = 'PiYG', n = 5)) +
       geom_sf(data = limt, fill = NA, col = 'grey20') +
       coord_sf() + 
       theme_bw() + 

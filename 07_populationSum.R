@@ -62,13 +62,73 @@ get_sum_population <- function(spc){
 # Apply the function ------------------------------------------------------
 map(spcs[40], get_sum_population)
 
-YRWA <- readRDS('outputs/rds/sum_pop_YRWA.rds')
+#YRWA <- readRDS('outputs/rds/sum_pop_YRWA.rds')
 
-# Make line graph  ------------------------------------------------------
 
-# Selección de colores
-cols <- c("#D43F3A", "#EEA236", "#5CB85C", "#46B8DA", "#9632B8")
+# To read the results -----------------------------------------------------
+fles <- dir_ls('./outputs/rds', regexp = '.rds$')
+fles <- grep('sum_pop', fles, value = TRUE)
+tbls <- map(.x = fles, .f = readRDS)
+tbls <- map(.x = tbls, .f = as_tibble)
+tble <- bind_rows(tbls)
+spcs <- unique(tble$specie)
 
-a<- ggplot(YRWA, aes(x = period, y = sum_pop, color = model)) + 
-     geom_line(linetype = 3, lwd =2.1) +
-     scale_color_manual(values = cols)
+infr <- min(tble$sum_pop)
+supr <- max(tble$sum_pop)
+
+# To make the  bar graph -------------------------------------------------------
+make_graph <- function(spc){
+  
+  #spc <- spcs[1] # Run and erase
+    cat('Start ', spc, '\n')
+  tbl <- filter(tble, specie == spc)
+  tbl <- mutate(tbl, period = factor(period, levels = c('2011', '2031', '2051', '2071', '2091', '2100')))
+  tbl <- mutate(tbl, run = factor(run, levels = c('1', '2', '3', '4', '5')))
+  
+  ggg <- ggplot(data = tbl, aes(x = period, y = sum_pop / 1000000, fill = run)) + 
+    geom_bar(stat = 'identity', position = position_dodge()) + 
+    facet_wrap(.~model, nrow = 1, ncol = 3) +
+    scale_fill_manual(values = c("#D43F3A", "#EEA236", "#5CB85C", "#46B8DA", "#9632B8")) +
+    ggtitle(label = glue('Specie: {spc}')) +
+    scale_y_continuous(breaks = seq(0, 10, 1), limits = c(0, 10)) +
+    theme(legend.position = 'bottom', 
+          axis.text.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5), 
+          plot.title = element_text(size = 16, hjust = 0.5, face = 'bold')) +
+    labs(x = '', y = 'Total population (x 1000000)', fill = 'Run')
+  
+  out <- glue('./graphs/figs/sum_pop/{spc}.png')
+  
+  ggsave(plot = ggg, filename = out, units = 'in', width = 12, height = 9, dpi = 300)
+
+}
+
+map(spcs, make_graph)
+
+
+# To make the graph -------------------------------------------------------
+make_point_graph <- function(spc){
+  
+  #spc <- spcs[1] # Run and erase
+  cat('Start ', spc, '\n')
+  tbl <- filter(tble, specie == spc)
+  tbl <- mutate(tbl, period = factor(period, levels = c('2011', '2031', '2051', '2071', '2091', '2100')))
+  tbl <- mutate(tbl, run = factor(run, levels = c('1', '2', '3', '4', '5')))
+  
+  ggg <- ggplot(data = tbl, aes(x = period, y = sum_pop / 1000000, fill = run)) + 
+    geom_bar(stat = 'identity', position = position_dodge()) + 
+    facet_wrap(.~model, nrow = 1, ncol = 3) +
+    scale_fill_manual(values = c("#D43F3A", "#EEA236", "#5CB85C", "#46B8DA", "#9632B8")) +
+    ggtitle(label = glue('Specie: {spc}')) +
+    scale_y_continuous(breaks = seq(0, 10, 1), limits = c(0, 10)) +
+    theme(legend.position = 'bottom', 
+          axis.text.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5), 
+          plot.title = element_text(size = 16, hjust = 0.5, face = 'bold')) +
+    labs(x = '', y = 'Total population (x 1000000)', fill = 'Run')
+  
+  out <- glue('./graphs/figs/sum_pop/{spc}.png')
+  
+  ggsave(plot = ggg, filename = out, units = 'in', width = 12, height = 9, dpi = 300)
+  
+}
+
+map(spcs, make_graph)
