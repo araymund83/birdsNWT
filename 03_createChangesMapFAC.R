@@ -84,7 +84,7 @@ see_changes <- function(spc){
   tbl <- bind_rows(tbl)
   tbl <- mutate(tbl, rt_bn = factor(rt_bn, levels = c('Negative', 'None', 'Positive')))
   tbl %>% group_by(gc, rt_bn) %>% summarise(count = n()) %>% ungroup()
-  qsave(x = tbl, file = glue('./qs/{spc}_table_ratio.qs'))
+  qs::qsave(x = tbl, file = glue('./qs/{spc}_table_ratio.qs'))
   
   
   cat('To make the map binary\n')
@@ -156,6 +156,11 @@ see_changes <- function(spc){
     slp <- raster.kendall(x = k, p.value = TRUE)
     cat('Done\n')
   })
+  
+  
+  
+  
+  
   slpe
   slpe.tbl <- rasterToPoints(slpe, spatial = FALSE)
   slpe.tbl <- as_tibble(slpe.tbl)
