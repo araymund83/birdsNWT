@@ -16,7 +16,7 @@ print(spcs)
 # Making an example for one specie ----------------------------
 make_average_reps <- function(sp){
   # sp <- spcs[4]
-  cat('Start\n')
+  cat('Start\n', sp, '\n')
   fls <- fs::dir_ls(sp) #lista archivos
   dir <- sp # directorio de trabajo
   spn <- basename(sp) #tiene 4 letras de codigo de especies despues del ultimo _
@@ -62,7 +62,8 @@ make_average_reps <- function(sp){
 
 
 # Apply the function -----------------------------------------------------
-map(spcs[4], make_average_reps)
+map(spcs[37], make_average_reps)
+map(spcs[29:30], make_average_reps)
 
 
 

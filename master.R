@@ -4,7 +4,7 @@ library(pacman)
 pacman::p_load(raster, rgdal, rgeos, readxl, stringr, sf, tidyverse, terra, foreach, fs)
 
 
-#birdList <- c("AMRO","ATSP","BAWW")
+birdList <- c("ATTW","BARS","CONW", "EVGR","GCKI", "GCTH", "LEYE", "OSFL")
 
 ##complete list of species from google drive
 # birdList <- c("ALFL", "AMCR", "AMRE","AMRO","ATSP","BAWW", "BBWA", "BBWO", "BCCH",
@@ -37,7 +37,7 @@ birdPredictions <- downloadPredRas(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c
 
 predStack <- loadBirdPredictions(birdList = birdList,
                                     pathData = pathData,
-                                    climateScenario = "CanESM2_",
+                                    #climateScenario = "CanESM2_",
                                     year = year)
 
 

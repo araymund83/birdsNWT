@@ -84,5 +84,6 @@ NU <- canProvs[canProvs$NAME_1 %in% NU, ]
 YK <- canProvs[canProvs$NAME_1 %in% YK, ]
 
 bcr6NT <- st_intersection(bcr6, NT)
+bcr6NU <- st_intersection(bcr6, NU)
 
 ecodist<- 
