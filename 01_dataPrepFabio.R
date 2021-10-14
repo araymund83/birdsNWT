@@ -62,8 +62,8 @@ make_average_reps <- function(sp){
 
 
 # Apply the function -----------------------------------------------------
-map(spcs[37], make_average_reps)
-map(spcs[29:30], make_average_reps)
+map(spcs, make_average_reps)
+
 
 
 

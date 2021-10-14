@@ -1,0 +1,13 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+cache/
+inputs/
+*.tif
+graphs/
+outputs/
+qs/
+*.png
+
+
