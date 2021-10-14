@@ -45,22 +45,15 @@ raster_to_table <- function(spc){
   
   rsl <- bind_rows(dfm)
   #browser
-  #fst::write_fst(x = rsl, path = glue('./outputs/{spc}/tbl_yrs_{spc}.fst'))
+  #fst::write_fst(x = rsl, path = glue('./outputs/{spc}/tbl_yrs_{spc}.fst')) ## saving with .fst creates very big files! 
   qs::qsave(x = rsl, file = glue('./outputs/{spc}/tbl_yrs_{spc}.qs'))
   
   cat('------- Done -------\n')
   return(rsl)
   
 }
-
-# Raster to table ---------------------------------------------------------
-dfrm <- map(.x = spcs[31:40], .f = raster_to_table)
-dfrm <- map(.x = spcs[41:50], .f = raster_to_table)
-dfrm <- map(.x = spcs[51:60], .f = raster_to_table)
-dfrm <- map(.x = spcs[61:70], .f = raster_to_table)
-dfrm <- map(.x = spcs[71:75], .f = raster_to_table)
-
-
+### Raster to table ---------------------------------------------------------
+dfrm <- map(.x = spcs, .f = raster_to_table)
 dim(dfrm)
 object.size(dfrm)
 
