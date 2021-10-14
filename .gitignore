@@ -4,4 +4,7 @@
 .Ruserdata
 inputs/
 *.tif
+cache/
+graphs/
+outputs/
 
