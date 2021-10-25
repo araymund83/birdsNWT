@@ -62,7 +62,7 @@ make_average_reps <- function(sp){
 
 
 # Apply the function -----------------------------------------------------
-map(spcs, make_average_reps)
+spStack <- map(spcs, make_average_reps)
 
 
 

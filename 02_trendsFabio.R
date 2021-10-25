@@ -1,5 +1,6 @@
 # Load libraries --------------------------------------------------------
 require(pacman)
+
 pacman::p_load(raster, rgdal, rgeos, terra, stringr, glue, sf, tidyverse, RStoolbox, fs, fst, trend)
 
 g <- gc(reset = TRUE)
