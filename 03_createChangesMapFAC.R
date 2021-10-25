@@ -11,9 +11,9 @@ rm(list = ls())
 root <- './outputs'
 dirs <- fs::dir_ls(root, type = 'directory')
 spcs <- basename(dirs)
-limt <- sf::st_read('inputs/NTbcr6/bcr6NT_polyfromRas.shp') 
+limt <- sf::st_read('inputs/NT1_BCR6/NT1_BCR6_poly.shp') 
 
-ecrg <- sf::st_read('inputs/NT_ecoregions/NTecoregionsClipped.shp')
+ecrg <- sf::st_read('inputs/ecoregions/ecoregions.shp')
 
 targetCRS <- paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
                    "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")
@@ -24,6 +24,7 @@ limt <- sf::st_transform(x = limt, crs = targetCRS)
 ecrg <- sf::st_transform(x = ecrg, crs = targetCRS)
 ecrg_limt <- sf::st_intersection(x = ecrg, y = limt)
 plot(st_geometry(ecrg_limt))
+plot(st_geometry(limt))
 
 # Function to use ---------------------------------------------------------
 see_changes <- function(spc){
@@ -145,87 +146,6 @@ zonal_Changes <- function(spc){
   ggsave(plot = gbr, filename = ogb, units = 'in', width = 13, height = 6.8, dpi = 300)
 }  
 
-
-
-  # cat('Table to raster\n')
-  # rst <- map(.x = 1:length(gcm), .f = function(k){
-  #   
-  #   cat(k)
-  #   sub <- tbl %>% 
-  #     filter(gc == gcm[k]) %>% 
-  #     dplyr::select(lon, lat, y2011:y2100)
-  #   
-  #   rsr <- map(.x = 3:ncol(sub), .f = function(z){
-  #     sub %>% dplyr::select(1, 2, z) %>% rasterFromXYZ()
-  #   })
-  #   
-  #   rsr <- raster::stack(rsr)
-  #   cat('Done\n')
-  #   return(rsr)
-  #   
-  # })
-  # 
-  # cat('To calculate the slopes\n')
-  # plan(cluster, workers = 3, gc = TRUE)
-  # slpe <- furrr::future_map(.x = 1:length(rst), .f = function(k){
-  #   library(spatialEco); library(raster)
-  #   cat('Start\n')
-  #   slp <- raster.kendall(x = rst[[k]], p.value = TRUE)
-  #   raster::writeRaster(x = slp[[1]], filename = glue('./outputs/{spc}/slp_{gcm[k]}.tif'), overwrite = TRUE)
-  #   raster::writeRaster(x = slp[[2]], filename = glue('./outputs/{spc}/pvl_{gcm[k]}.tif'), overwrite = TRUE)
-  #   cat('Done\n')
-  #   return(slp)
-  # })
-  # future:::ClusterRegistry('stop')
-  # 
-  # 
-  # slpe.tble <- map(.x = 1:length(slpe), .f = function(k){
-  #   cat(k, '\n')
-  #   rsl <- slpe[[k]] %>% 
-  #     rasterToPoints(., spatial = FALSE) %>% 
-  #     as_tibble() %>% 
-  #     mutate(model = gcm[k]) %>% 
-  #     setNames(c('x', 'y', 'slp', 'pvl', 'model')) %>% 
-  #     mutate(model = gcm[k])
-  #   return(rsl)
-  # })
-  # 
-  # slpe.tble <- bind_rows(slpe.tble)
-  # 
-  # cat('To make the map\n')
-  # gslp <- ggplot() + 
-  #   geom_tile(data = slpe.tble, aes(x = x, y = y, fill = slp)) + 
-  #   facet_wrap(.~model, ncol = 3, nrow = 1) +
-  #   scale_fill_binned_sequential(palette = 'blues') + 
-  #   theme_void() +
-  #   coord_sf() +
-  #   theme(legend.position = 'bottom', 
-  #         legend.key.width = unit(3, 'line')) +
-  #   labs(x = 'Lon', y = 'Lat', fill = 'Slope')
-  # 
-  # gpvl <- ggplot() + 
-  #   geom_tile(data = slpe.tble, aes(x = x, y = y, fill = pvl)) + 
-  #   facet_wrap(.~model, ncol = 3, nrow = 1) +
-  #   scale_fill_binned_sequential(palette = 'ag_GrnYl', rev = FALSE, breaks = c(0.05, 0.25, 0.5, 0.75)) + 
-  #   theme_void() +
-  #   coord_sf() +
-  #   theme(legend.position = 'bottom', 
-  #         legend.key.width = unit(3, 'line')) +
-  #   labs(x = 'Lon', y = 'Lat', fill = 'p-value')
-  # 
-  # 
-  # gall <- ggarrange(gslp, gpvl, ncol = 1, nrow = 2)
-  # 
-  # ggsave(plot = gall, 
-  #        filename = glue('./graphs/maps/{spc}_slp_pvl.png'), 
-  #        units = 'in', width = 13, height = 10, dpi = 300)
-  # 
-#   cat('------------------------------------------------------------------------------------------------------\n')
-#   cat('------------------------------------------------- Done -----------------------------------------------\n')
-#   cat('------------------------------------------------------------------------------------------------------\n')
-#   
-# }
-  
 
 # Apply the function ------------------------------------------------------
 
