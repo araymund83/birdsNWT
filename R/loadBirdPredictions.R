@@ -3,7 +3,14 @@ loadBirdPredictions<- function(birdList,
                                climateScenario = NULL,
                                year = NULL){
    predictionsPath <- checkPath(file.path(pathData), create = TRUE)
+   browser()
    message(crayon::green(paste0("Looking for files in ", predictionsPath)))
+   
+   # fls <- dir_ls(path = './outputs', regexp = '.tif$')
+   # files <- fs::dir_ls(predictionsPath, regexp = '.tif$')
+   # files <- grep('mean_', fls, value = TRUE
+                 
+   
    listDirs <- list.dirs(predictionsPath, recursive = FALSE)
    allPredictions <- lapply(X = birdList, FUN = function(bird){
    ##list all files within the predictionsPath that match the pattern

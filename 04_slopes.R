@@ -4,20 +4,44 @@ pacman::p_load(parallel, foreach, doSNOW,raster, rgdal, rgeos, reproducible, RCo
                ggpubr, gridExtra, terra, stringr, glue, sf, tidyverse, 
                RStoolbox, fs, fst, trend, colorspace, hrbrthemes,exactextractr, furrr, future, spatialEco)
 
+
 g <- gc(reset = TRUE)
 rm(list = ls())
 
-
-###Load data ---------------------------------------------------------------4
+# Load data ---------------------------------------------------------------
 root <- './outputs'
 dirs <- fs::dir_ls(root, type = 'directory')
 spcs <- basename(dirs)
+fls <- fs::dir_ls(dirs, regexp = '.tif$')
+fls <- grep('mean_', fls, value = TRUE)
 
- 
+yrs <- parse_number(basename(fls))
+yrs <- unique(yrs)
+yrs <- na.omit(yrs)
+
+gcm <- str_sub(basename(fls), start = 16, end = nchar(basename(fls)) - 4)
+gcm <- unique(gcm)
+
+fls <- grep(paste0(yrs, collapse = '|'), fls, value = TRUE)
+
+
+# See the changes  ---------------------------------------------------------
+raster_to_table <- function(spc){
+  
+  # Proof
+  spc <- spcs[2] # Run and comment (after)
+  cat('Start ', spc, '\n')
+  dir <- grep(spc, dirs, value = TRUE)
+  fls <- fs::dir_ls(dir, regexp = '.tif$')
+  yrs <- parse_number(basename(fls))
+  yrs <- unique(yrs)
+  yrs <- na.omit(yrs)
+  gcm <- str_sub(basename(fls), start = 16, end = nchar(basename(fls)) - 4)
+  gcm <- unique(gcm)
 
 
 calcSlopes<- function(spc){
-#spc <- spcs[7]
+spc <- spcs[9]
 cat('-------------------------------------------------------------\n')
 cat('To start ', spc, '\n')
 cat('-------------------------------------------------------------\n')
