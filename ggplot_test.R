@@ -12,9 +12,9 @@ gslp <- ggplot() +
   #scale_fill_continuous_diverging(palette = 'Red-Green', p1 = -0.02, p2 = 0.02) +
   #scale_fill_gradientn (name = "slope", colours = divColors(5)) +
   #scale_color_gradient( low = '#D73027', high = '#1A9850'
-  #scale_fill_gradientn(colours= c('#D73027', '#e9e9e9','#1A9850'), limits = c(min,max), oob = scales::squish) +  ## this one was the best option
+  #scale_fill_gradientn(colours= c('#D73027', '#e9e9e9','#1A9850'), limits = c(min,max), oob = scales::squish) +  
   #rcartocolor::scale_fill_Carto_c(name = 'slope', type = 'diverging', palette = 'Geyser', direction = -1) +
-  #scale_fill_gradient2(limits = c(-0.05, 0.05), low = 'red', high = 'green', mid = '#e9e9e9', midpoint = 0) +
+  scale_fill_gradient2(limits = c(min, max), low = '#D73027', high = '#1A9850', mid = '#e9e9e9', midpoint = 0) + ## this one was the best option
   #theme_void() +  '
   # theme(plot.title = element_text(size = 20, face = 'bold'),
   #       plot.background = element_blank(),
