@@ -1,3 +1,5 @@
+##this script calculates the mean  of the 5 replicates for each species/gcm/year
+
 # Load libraries --------------------------------------------
 library(pacman)
 

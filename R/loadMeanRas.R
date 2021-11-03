@@ -1,31 +1,30 @@
-loadMeanRas<- function(birdList, 
+loadMeanRas<- function(species, 
                        pathData,
-                       climateScenario = NULL,
-                       year = NULL){
-  meanPath <- checkPath(file.path(pathData), create = TRUE)
+                       pattern, 
+                       gcm= NULL,
+                       years = NULL){
   
-  browser()
-  message(crayon::green(paste0("Looking for files in ", meanPath)))
+ pathData <- reproducible::checkPath(file.path(pathData), create = TRUE)
   
+ dirs <- fs::dir_ls(pathData, type = 'directory')
+ meansAvailable <- lapply(X = species, FUN = function(sp){
+   message(crayon::green('Loading files for', sp))
+ allFiles <- usefulFuns::grepMulti(x= list.files(path = dirs, full.names = TRUE), 
+                                   patterns = paste(pattern, sp, sep = '_'))
+ gcm <- str_sub(basename(allFiles), start = 16, end = nchar(basename(allFiles)) - 4)
+ gcm <- unique(gcm)
+ 
+ gcmAvailable <- map(.x = 1:length(gcm), .f = function(gc){
+    message(crayon::green('Creating time series for', gc))
+    files <- grep(gcm[gc], allFiles, value = TRUE)
+    gcmFiles <- lapply(files, raster)
+    gcmStack <- stack(gcmFiles)
   
-  
-  listDirs <- list.dirs(meanPath, recursive = FALSE)
-  allMeans <- lapply(X = birdList, FUN = function(bird){
-    ##list all files within the meanPath that match the pattern
-    meanAvailable <- usefulFuns::grepMulti(x = list.files(listDirs, full.names = TRUE),
-                                           patterns = c(bird, climateScenario))
-    browser()
-    if(length(meanAvailable) == 0)
-      stop(paste0("Predictions for" , bird,
-                  "are not available. Please verify species"))
-    
-    message(crayon::green("Loading the following file(s) for", bird))
-    message(crayon::magenta(paste0(" "), paste0(meanAvailable, sep = "\n")))
-    allRas <- lapply(meanAvailable, raster)
-    return(allRas)
-  }
-  )
-  stkRas <- lapply(allMeans, stack)
-  names(stkRas) <- birdList
-  return(stkRas)
+  })
+ names(gcmAvailable) <- gcm
+ return(gcmAvailable)
+ return(meansAvailable)
+ })
 }
+
+

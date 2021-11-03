@@ -53,15 +53,15 @@ see_changes <- function(spc){
     return(rs)
   })
   
-  cat('To make a simple map\n')
+  cat('Making a simple map\n')
   gavg <- ggplot() + 
     geom_tile(data = tbl, aes(x = lon, y = lat, fill = avg)) + 
-    #geom_sf(data = limt, fill = NA, col = 'grey') +
-    #geom_sf(data = ecrg_limt, fill = NA) +
+    geom_sf(data = limt, fill = NA, col = '#D3D3D3') +
+    #geom_sf(data = ecrg_limt, fill = NA, col = '#D3D3D3') +
     coord_sf() + 
     facet_wrap(.~gc, nrow = 1, ncol = 3) +
     # scale_fill_gradientn(colors = RColorBrewer::brewer.pal(n = 8, name = 'YlOrBr')) + 
-    scale_fill_binned_sequential(palette = 'Heat') +
+    scale_fill_binned_sequential(palette = 'Teal') +
     theme_bw() + 
     theme(panel.grid.major = element_blank(),
           axis.text.y = element_text(angle = 90, hjust = 0.5, vjust = 0.5), 
@@ -69,10 +69,10 @@ see_changes <- function(spc){
     labs(x = 'Longitude', y = 'Latitude', fill = 'Mean') 
   
   ggsave(plot = gavg, filename = glue('./graphs/maps/avg_gcm_{spc}.png'), 
-         units = 'in', width = 13, height = 8, dpi = 300)
-  
-  cat('To estimate the change (ratio), initial and final year\n')
-  tbl <- mutate(tbl, ratio = (y2100 - y2011) / y2011 * 100)
+         units = 'in', width = 13, height = 8, dpi = 700)
+  ## this code calculates the ratio from y2011 to 2091
+  cat('Estimating the change (ratio), initial and final year\n')
+  tbl <- mutate(tbl, ratio = ((y2091 - y2011) / y2011)* 100)  #change 2100 for 2091
   std <- tbl %>% group_by(gc) %>% summarise(std = sd(ratio)) %>% ungroup()
   tbl <- map(.x = 1:3, .f = function(i){
     st <- std %>% filter(gc == gcm[i]) %>% pull(std)
@@ -88,25 +88,28 @@ see_changes <- function(spc){
   tbl %>% group_by(gc, rt_bn) %>% summarise(count = n()) %>% ungroup()
   qs::qsave(x = tbl, file = glue('./qs/{spc}_table_ratio.qs'))
   
-  cat('To make the map binary\n')
+  cat('Making a binnary map\n')
   gbn <- ggplot() + 
     geom_tile(data = tbl, aes(x = lon, y = lat, fill = rt_bn)) + 
+    geom_sf(data = limt, fill = NA, col = 'grey74') +
+    geom_sf(data = ecrg_limt, fill = NA, col = 'grey74') +
     facet_wrap(.~gc, ncol = 3, nrow = 1) + 
-    scale_fill_manual(values = c("#e97D56", "#999999", "#afceeb")) + 
+    scale_fill_manual(values = c('#D73027','#f4f4f4', '#1A9870')) + ## change green from #1A9850
     ggtitle(label = spc) +
-    theme_ipsum_es() + 
+    #theme_ipsum_es() + 
+    theme_bw() +
     theme(legend.position = 'bottom', 
           axis.text.y = element_text(angle = 90, vjust = 0.5)) +
     labs(x = 'Longitude', y = 'Latitude', fill = 'Change')
   
   ggsave(plot = gbn, filename = glue('./graphs/maps/bin_gcm_change_{spc}.png'),
-         units = 'in', width = 12, height = 9, dpi = 300)
+         units = 'in', width = 12, height = 9, dpi = 700)
 }
 
 
 # Apply the function ------------------------------------------------------
 
-map(.x = spcs[61:75], .f = see_changes)
+map(.x = spcs, .f = see_changes)
 
 zonal_Changes <- function(spc){   
   

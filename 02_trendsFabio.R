@@ -19,6 +19,7 @@ raster_to_table <- function(spc){
   cat('Start ', spc, '\n')
   dir <- grep(spc, dirs, value = TRUE)
   fls <- fs::dir_ls(dir, regexp = '.tif$')
+  fls <- fls <- grep('mean', fls, value = TRUE)
   yrs <- parse_number(basename(fls))
   yrs <- unique(yrs)
   yrs <- na.omit(yrs)
@@ -36,6 +37,7 @@ raster_to_table <- function(spc){
     tb <- terra::as.points(tr)
     df <- terra::as.data.frame(x = tb)
     names(df) <- paste0('y', yrs)
+    
     gm <- terra::geom(tb)
     df <- cbind(gm[,3:4], df)
     df <- as_tibble(df)
