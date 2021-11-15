@@ -1,24 +1,28 @@
-birdList <- c("AMRO")
+species <- c('AMRO', 'LEYE')
 
 library(pacman)
-pacman::p_load(raster, rgdal, rgeos, readxl, stringr, sf, tidyverse, terra, foreach, fs)
+pacman::p_load(raster, rgdal, rgeos, reproducible, readxl, stringr, sf, tidyverse, terra, foreach, fs, data.table)
 
 
-birdList <- c("ATTW","BARS","CONW", "EVGR","GCKI", "GCTH", "LEYE", "OSFL")
+species <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP")
 
-##complete list of species from google drive
-# birdList <- c("ALFL", "AMCR", "AMRE","AMRO","ATSP","BAWW", "BBWA", "BBWO", "BCCH",
-#              "BHCO", "BHVI","BLPW", "BOCH", "BRBL", "BRCR", "BTNW", "CAWA", "CCSP",
-#              "CHSP", "CORA", "COYE", "DEJU", "EAKI", "FOSP", "GRAJ", "HAFL", "HETH",
-#              "HOLA", "LCSP", "LEFL", "LISP", "MAWA", "NOFL", "NOWA", "OCWA", "OVEN",
-#              "PAWA", "PHVI", "PISI", "PIWO", "PUFI", "RBGR", "RBNU", "RCKI", "REVI",
-#              "RUBL", "RUGR", "RWBL", "SAVS", "SOSP", "SWSP", "SWTH", "TEWA" ,"TRES",
-#              "VATH", "WAVI", "WCSP", "WETA", "WEWP", "WIWA", "WIWR", "WTSP", "WWCR",
-#              "YBFL", "YBSA", "YEWA", "YRWA")
+#complete list of species from google drive
+species <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP", "ATTW", "BARS", "BAWW",
+              "BBWA", "BBWO", "BCCH", "BHCO", "BHVI", "BLPW", "BOCH", "BRBL",
+              "BRCR", "BTNW", "CAWA", "CCSP", "CHSP", "CONW", "CORA", "COYE",
+              "DEJU", "EAKI", "EVGR", "FOSP", "GCKI", "GCTH", "GRAJ", "HAFL",
+              "HETH", "HOLA", "LCSP", "LEFL", "LEYE", "LISP", "MAWA", "NOFL",
+              "NOWA", "OCWA", "OSFL", "OVEN", "PAWA", "PHVI", "PISI", "PIWO",
+              "PUFI", "RBGR", "RBNU", "RCKI", "REVI", "RUBL", "RUGR", "RWBL",
+              "SAVS", "SOSP", "SWSP", "SWTH", "TEWA" ,"TRES", "VATH", "WAVI",
+              "WCSP", "WETA", "WEWP", "WIWA", "WIWR", "WTSP", "WWCR", "YBFL",
+              "YBSA", "YEWA", "YRWA")
 
-climateScenario <- "INM-CM4"  #There are other two options for GCM:  CCSM4 and INM-CM4
-year <- paste(c(2011,2100), collapse = "|")
-pathData <- file.path(getwd(), "inputs/predictions")
+gcm<- paste(c('CanESM2', 'CCSM4', 'INM-CM4'), collapse = '|')  #There are other two options for GCM: 'CanESM2', 'CCSM4' and 'INM-CM4'
+years <- paste(c(2011, 2031,2051,2071,2091, 2100), collapse = "|")
+
+pathData <- './outputs'
+
 
 
 
@@ -35,10 +39,14 @@ birdPredictions <- downloadPredRas(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c
                                           rastersPath =pathData
                                             )
 
-predStack <- loadBirdPredictions(birdList = birdList,
-                                    pathData = pathData,
-                                    #climateScenario = "CanESM2_",
-                                    year = year)
+meanStack <- loadMeanRas(species = species,
+                         pathData = pathData,
+                         pattern = 'mean')
+
+names(meanStack) <- species
+
+flatten(meanStack)                             
+
 
 
 # Apply the function -----------------------------------------------------

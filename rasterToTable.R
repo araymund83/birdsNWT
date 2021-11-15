@@ -15,8 +15,8 @@ spcs <- basename(dirs)
 raster_to_table <- function(spc){
   
   # Proof
-  spc <- spcs[2] # Run and comment (after)
-  cat('Start ', spc, '\n')
+  #spc <- spcs[2] # Run and comment (after)
+
   dir <- grep(spc, dirs, value = TRUE)
   fls <- fs::dir_ls(dir, regexp = '.tif$')
   fls <- fls <- grep('mean', fls, value = TRUE)
@@ -26,7 +26,7 @@ raster_to_table <- function(spc){
   gcm <- str_sub(basename(fls), start = 16, end = nchar(basename(fls)) - 4)
   gcm <- unique(gcm)
   
-  cat('Raster to table\n')
+  message(crayon::blue(paste0('Making table for', spc)))
   dfm <- map(.x = 1:length(gcm), .f = function(k){
     
     cat(gcm[k], '\n')
@@ -42,6 +42,7 @@ raster_to_table <- function(spc){
     df <- cbind(gm[,3:4], df)
     df <- as_tibble(df)
     df <- mutate(df, gc = gcm[k])
+    df <- mutate(df, sp = spc)
     return(df)
     
   })
@@ -49,16 +50,16 @@ raster_to_table <- function(spc){
   rsl <- bind_rows(dfm)
   #browser
   #fst::write_fst(x = rsl, path = glue('./outputs/{spc}/tbl_yrs_{spc}.fst')) ## saving with .fst creates very big files! 
-  qs::qsave(x = rsl, file = glue('./outputs/{spc}/tbl_yrs_{spc}.qs'))
+  qs::qsave(x = rsl, file = glue('./tables/qs/{spc}_mean_tbl.qs'))
   
   cat('------- Done -------\n')
   return(rsl)
   
 }
-### Raster to table ---------------------------------------------------------
-dfrm <- map(.x = spcs, .f = raster_to_table)
-dim(dfrm)
-object.size(dfrm)
 
-## to read qs
-table<- qs::qread(file = glue('./outputs/{spc}/tbl_yrs_{spc}.qs'))
+# Apply the function ------------------------------------------------------
+
+map(.x = spcs[71:75], .f = raster_to_table)
+
+
+

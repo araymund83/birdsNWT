@@ -1,3 +1,5 @@
+##this script calculates the mean  of the 5 replicates for each species/gcm/year
+
 # Load libraries --------------------------------------------
 library(pacman)
 
@@ -62,7 +64,7 @@ make_average_reps <- function(sp){
 
 
 # Apply the function -----------------------------------------------------
-map(spcs, make_average_reps)
+spStack <- map(spcs, make_average_reps)
 
 
 

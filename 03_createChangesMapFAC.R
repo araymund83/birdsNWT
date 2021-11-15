@@ -1,6 +1,6 @@
 # Load libraries ----------------------------------------------------------
 require(pacman)
-pacman::p_load(parallel, raster, rgdal, rgeos, reproducible, RColorBrewer, ggspatial, 
+pacman::p_load(parallel, foreach, doSNOW,raster, rgdal, rgeos, reproducible, RColorBrewer, ggspatial, 
                ggpubr, gridExtra, terra, stringr, glue, sf, tidyverse, 
                RStoolbox, fs, fst, trend, colorspace, hrbrthemes,exactextractr, furrr, future, spatialEco)
 
@@ -11,7 +11,7 @@ rm(list = ls())
 root <- './outputs'
 dirs <- fs::dir_ls(root, type = 'directory')
 spcs <- basename(dirs)
-limt <- sf::st_read('inputs/NTbcr6/bcr6NT_polyfromRas.shp') 
+limt <- sf::st_read('inputs/NT1_BCR6/NT1_BCR6_poly.shp') 
 
 ecrg <- sf::st_read('inputs/ecoregions/ecoregions.shp')
 
@@ -21,21 +21,25 @@ targetCRS <- paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
 # Extract by mask for the ecoregions ---------------------------------------
 plot(st_geometry(ecrg))
 limt <- sf::st_transform(x = limt, crs = targetCRS)
-ecrg <- sf::st_transform(x = ecrg, crs = st_crs(limt))
+ecrg <- sf::st_transform(x = ecrg, crs = targetCRS)
 ecrg_limt <- sf::st_intersection(x = ecrg, y = limt)
 plot(st_geometry(ecrg_limt))
+plot(st_geometry(limt))
 
 # Function to use ---------------------------------------------------------
 see_changes <- function(spc){
   
-  #spc <- spcs[2]
+ #spc <- spcs[1]
+  cat('-------------------------------------------------------------\n')
   cat('To start ', spc, '\n')
+  cat('-------------------------------------------------------------\n')
+
   dir <- grep(spc, dirs, value = TRUE)
   fle <- fs::dir_ls(dir, regexp = '.qs')
   tbl <- qs::qread(file = glue('./outputs/{spc}/tbl_yrs_{spc}.qs'))
   tbl <- dplyr::select(tbl, x, y, gc, everything())
   names(tbl)[1:2] <- c('lon', 'lat')
-  tbl <- mutate(tbl, avg = rowMeans(tbl[,3:8]))
+  tbl <- mutate(tbl, avg = rowMeans(tbl[,4:9]))
   tbl <- as_tibble(tbl)
   gcm <- unique(tbl$gc)
   
@@ -49,15 +53,15 @@ see_changes <- function(spc){
     return(rs)
   })
   
-  cat('To make a simple map\n')
+  cat('Making a simple map\n')
   gavg <- ggplot() + 
     geom_tile(data = tbl, aes(x = lon, y = lat, fill = avg)) + 
-    geom_sf(data = limt, fill = NA, col = 'grey') +
-    geom_sf(data = ecrg_limt, fill = NA) +
+    geom_sf(data = limt, fill = NA, col = '#D3D3D3') +
+    #geom_sf(data = ecrg_limt, fill = NA, col = '#D3D3D3') +
     coord_sf() + 
     facet_wrap(.~gc, nrow = 1, ncol = 3) +
     # scale_fill_gradientn(colors = RColorBrewer::brewer.pal(n = 8, name = 'YlOrBr')) + 
-    scale_fill_binned_sequential(palette = 'Heat') +
+    scale_fill_binned_sequential(palette = 'Teal') +
     theme_bw() + 
     theme(panel.grid.major = element_blank(),
           axis.text.y = element_text(angle = 90, hjust = 0.5, vjust = 0.5), 
@@ -65,10 +69,10 @@ see_changes <- function(spc){
     labs(x = 'Longitude', y = 'Latitude', fill = 'Mean') 
   
   ggsave(plot = gavg, filename = glue('./graphs/maps/avg_gcm_{spc}.png'), 
-         units = 'in', width = 13, height = 8, dpi = 300)
-  
-  cat('To estimate the change (ratio), initial and final year\n')
-  tbl <- mutate(tbl, ratio = (y2100 - y2011) / y2011 * 100)
+         units = 'in', width = 13, height = 8, dpi = 700)
+  ## this code calculates the ratio from y2011 to 2091
+  cat('Estimating the change (ratio), initial and final year\n')
+  tbl <- mutate(tbl, ratio = ((y2091 - y2011) / y2011)* 100)  #change 2100 for 2091
   std <- tbl %>% group_by(gc) %>% summarise(std = sd(ratio)) %>% ungroup()
   tbl <- map(.x = 1:3, .f = function(i){
     st <- std %>% filter(gc == gcm[i]) %>% pull(std)
@@ -84,28 +88,43 @@ see_changes <- function(spc){
   tbl %>% group_by(gc, rt_bn) %>% summarise(count = n()) %>% ungroup()
   qs::qsave(x = tbl, file = glue('./qs/{spc}_table_ratio.qs'))
   
-  cat('To make the map binary\n')
+  cat('Making a binnary map\n')
   gbn <- ggplot() + 
     geom_tile(data = tbl, aes(x = lon, y = lat, fill = rt_bn)) + 
+    geom_sf(data = limt, fill = NA, col = 'grey74') +
+    geom_sf(data = ecrg_limt, fill = NA, col = 'grey74') +
     facet_wrap(.~gc, ncol = 3, nrow = 1) + 
-    scale_fill_manual(values = c("#999999", "#E69F00", "#56B4E9")) + 
+    scale_fill_manual(values = c('#D73027','#f4f4f4', '#1A9870')) + ## change green from #1A9850
     ggtitle(label = spc) +
-    theme_ipsum_es() + 
+    #theme_ipsum_es() + 
+    theme_bw() +
     theme(legend.position = 'bottom', 
           axis.text.y = element_text(angle = 90, vjust = 0.5)) +
     labs(x = 'Longitude', y = 'Latitude', fill = 'Change')
   
   ggsave(plot = gbn, filename = glue('./graphs/maps/bin_gcm_change_{spc}.png'),
-         units = 'in', width = 12, height = 9, dpi = 300)
+         units = 'in', width = 12, height = 9, dpi = 700)
+}
+
+
+# Apply the function ------------------------------------------------------
+
+map(.x = spcs, .f = see_changes)
+
+zonal_Changes <- function(spc){   
   
-  cat('Now to make the zonal statistical\n')
+  #spc <- spcs[1]
+  cat('-------------------------------------------------------------\n')
+  cat('Making zonal statistics\n', spc, '\n')
+  cat('-------------------------------------------------------------\n')
+ 
   znl <- map(.x = 1:length(rst.avg), .f = function(k){
     
     cat('To start\n')
     cat(k, '\n')
-    znl <- exact_extract(rst.avg[[k]], ecrg_limt, c('mean', 'stdev'))
+    znl <- exact_extract(rst.avg[[k]], ecrg, c('mean', 'stdev'))
     znl <- round(znl, digits = 2)
-    znl <- mutate(znl, mdl = gcm[k], ecoregion = ecrg_limt$REGION_NAM)
+    znl <- mutate(znl, mdl = gcm[k], ecoregion = ecrg$REGION_NAM)
     cat('Done\n')
     return(znl)
     
@@ -128,67 +147,10 @@ see_changes <- function(spc){
   
   ogb <- glue('./graphs/figs/bar_ratio_{spc}.png')
   ggsave(plot = gbr, filename = ogb, units = 'in', width = 13, height = 6.8, dpi = 300)
-  
-  cat('Table to raster\n')
-  rst <- map(.x = 1:length(gcm), .f = function(k){
-    
-    cat(k)
-    sub <- tbl %>% 
-      filter(gc == gcm[k]) %>% 
-      dplyr::select(lon, lat, y2011:y2100)
-    
-    rsr <- map(.x = 3:ncol(sub), .f = function(z){
-      sub %>% dplyr::select(1, 2, z) %>% rasterFromXYZ()
-    })
-    
-    rsr <- raster::stack(rsr)
-    cat('Done\n')
-    return(rsr)
-    
-  })
-  
-  cat('To calculate the slopes\n')
-  slpe <- map(.x = rst, .f = function(k){
-    cat('Start\n')
-    slp <- raster.kendall(x = k, p.value = TRUE)
-    cat('Done\n')
-    return(slpe)
-  })
-  
-  
-  
-  
-  
-  slpe
-  slpe.tbl <- rasterToPoints(slpe, spatial = FALSE)
-  slpe.tbl <- as_tibble(slpe.tbl)
-  slpe.tbl <- slpe.tbl %>% setNames(c('x', 'y', 'slp', 'pvalue'))
-  slpe.tbl <- slpe.tbl %>% mutate(pvalue_bin = ifelse(pvalue < 0.10, 1, 0))
-  
-  cat('To make the binnary map\n')
-  gslp <- ggplot() + 
-    geom_tile(data = slpe.tbl, aes(x = x, y = y, fill = slp)) + 
-    scale_fill_binned_sequential(palette = 'YlOrRd') + 
-    theme_ipsum_es() +
-    coord_sf() +
-    theme(legend.position = 'bottom', 
-          legend.key.width = unit(3, 'line')) +
-    labs(x = 'Lon', y = 'Lat', fill = 'Slope')
-  
-  ggsave(plot = gslp, 
-         filename = './slp.png', 
-         units = 'in', width = 9, height = 8, dpi = 300)
-  
-  
-  cat('Done\n')
-  return(rs)
-  
-}
-
-
-
-
-
+}  
 
 
 # Apply the function ------------------------------------------------------
+
+map(.x = spcs[1:20], .f = zonal_Changes)
+
