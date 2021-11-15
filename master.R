@@ -1,13 +1,13 @@
 species <- c('AMRO', 'LEYE')
 
 library(pacman)
-pacman::p_load(raster, rgdal, rgeos, readxl, stringr, sf, tidyverse, terra, foreach, fs)
+pacman::p_load(raster, rgdal, rgeos, reproducible, readxl, stringr, sf, tidyverse, terra, foreach, fs, data.table)
 
 
 species <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP")
 
 #complete list of species from google drive
-birdList <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP", "ATTW", "BARS", "BAWW",
+species <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP", "ATTW", "BARS", "BAWW",
               "BBWA", "BBWO", "BCCH", "BHCO", "BHVI", "BLPW", "BOCH", "BRBL",
               "BRCR", "BTNW", "CAWA", "CCSP", "CHSP", "CONW", "CORA", "COYE",
               "DEJU", "EAKI", "EVGR", "FOSP", "GCKI", "GCTH", "GRAJ", "HAFL",
@@ -20,6 +20,7 @@ birdList <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP", "ATTW", "BARS", "BAWW",
 
 gcm<- paste(c('CanESM2', 'CCSM4', 'INM-CM4'), collapse = '|')  #There are other two options for GCM: 'CanESM2', 'CCSM4' and 'INM-CM4'
 years <- paste(c(2011, 2031,2051,2071,2091, 2100), collapse = "|")
+
 pathData <- './outputs'
 
 
@@ -44,7 +45,8 @@ meanStack <- loadMeanRas(species = species,
 
 names(meanStack) <- species
 
-                              
+flatten(meanStack)                             
+
 
 
 # Apply the function -----------------------------------------------------

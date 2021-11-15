@@ -37,3 +37,7 @@ ggsave(plot = gslp,
        units = 'in', width = 13, height = 10, dpi = 700)
 
 message(crayon::green("Done: ", spc))
+
+# Bar plot for changes ----------------------------------------------------
+
+

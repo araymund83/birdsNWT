@@ -7,8 +7,9 @@ pacman::p_load(raster, rgdal, rgeos, future, furrr, reproducible, RColorBrewer,
 
 
 require(pacman)
-pacman::p_load(caTools, colorspace,compiler, furrr, future, future.apply, fs, fst, ggpubr, ggspatial, glue, gridExtra,
-               RColorBrewer, raster, rgdal, rgeos, RStoolbox, sf, stringr, terra, tidyverse, trend)
+pacman::p_load(caTools, colorspace,compiler, furrr, future, future.apply, fs, 
+               fst, ggpubr, ggspatial, glue, gridExtra, RColorBrewer, raster, 
+               rgdal, rgeos, RStoolbox, sf, stringr, terra, tidyverse, trend)
 
 g <- gc(reset = TRUE)
 rm(list = ls())
@@ -93,8 +94,8 @@ make_graph <- function(spc){
     scale_y_continuous(breaks = seq(0, 10, 1), limits = c(0, 10)) +
     theme(legend.position = 'bottom', 
           axis.text.y = element_text(angle = 90, vjust = 0.5, hjust = 0.5), 
-          plot.title = element_text(size = 16, hjust = 0.5, face = 'bold')) +
-    labs(x = '', y = 'Total population (x 1000000)', fill = 'Run')
+          plot.title = element_text(size = 16
+          0000)', fill = 'Run')
   
   out <- glue('./graphs/figs/sum_pop/{spc}.png')
   
