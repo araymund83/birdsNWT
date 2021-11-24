@@ -5,8 +5,7 @@ speciesTable <- function(list,
   message(crayon::green ('Creating data table for:', sp))
   dtEachSp <- data.table(pixelID = 1:ncell(sp), getValues(sp))
   dtEachSp <- na.omit(dtEachSp)
-  retrun(dtEachSp)
-    
+  
 }
 
 unlist(allStack)

@@ -72,20 +72,21 @@ see_changes <- function(spc){
          units = 'in', width = 13, height = 8, dpi = 700)
   ## this code calculates the ratio from y2011 to 2091
   cat('Estimating the change (ratio), initial and final year\n')
-  tbl <- mutate(tbl, ratio = ((y2091 - y2011) / y2011)* 100)  #change 2100 for 2091
+  #tbl <- mutate(tbl, ratio = ((y2091 - y2011) / y2011)* 100)  #change 2100 for 2091
+  tbl <- mutate(tbl, ratio = (y2091 / y2011)* 100)  #change 2100 for 2091
   std <- tbl %>% group_by(gc) %>% summarise(std = sd(ratio)) %>% ungroup()
   tbl <- map(.x = 1:3, .f = function(i){
     st <- std %>% filter(gc == gcm[i]) %>% pull(std)
     st <- st / 4
-    tb <- tbl %>% 
-      filter(gc == gcm[i]) %>% 
+    tb <- tbl %>%
+      filter(gc == gcm[i]) %>%
       mutate(rt_bn = case_when(ratio >= st * -1 & ratio <= st ~ 'None',
                                ratio > st ~ 'Positive',
                                ratio < st * -1 ~ 'Negative'))
   })
   tbl <- bind_rows(tbl)
-  tbl <- mutate(tbl, rt_bn = factor(rt_bn, levels = c('Negative', 'None', 'Positive')))
-  tbl %>% group_by(gc, rt_bn) %>% summarise(count = n()) %>% ungroup()
+  # tbl <- mutate(tbl, rt_bn = factor(rt_bn, levels = c('Negative', 'None', 'Positive')))
+  # tbl %>% group_by(gc, rt_bn) %>% summarise(count = n()) %>% ungroup()
   qs::qsave(x = tbl, file = glue('./qs/{spc}_table_ratio.qs'))
   
   cat('Making a binnary map\n')

@@ -18,7 +18,9 @@ comm <- data.frame(data$abun[38:39,]); rownames(comm)<-c("Before","After")
 trait<- data.frame(data$traits);colnames(trait)<-c("T1","T2","T3")
 trait <- trait %>% rownames_to_column("name") #Species name to column to use as index when we merge the comm and trait table
 ```
-Regarding data preparation, we need to use the data in a long format for easier plotting. Also, we need only the trait information of the species that are present in a site so we first need to make a list object with the trait information of the species that are present in each site.
+Regarding data preparation, we need to use the data in a long format for easier plotting. Also, we need only the trait 
+information of the species that are present in a site so we first need to make a list object with the trait information of the
+species that are present in each site.
 ```{r long format}
 trait_comm<- comm %>%  
   rownames_to_column("Site") %>%  #We need to make site as a column for using as index when making pivot_longer()

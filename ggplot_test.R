@@ -39,5 +39,35 @@ ggsave(plot = gslp,
 message(crayon::green("Done: ", spc))
 
 # Bar plot for changes ----------------------------------------------------
+# making a bar plot -------------------------------------------------------
 
+plot <- ggplot(data = canESM, aes(x = Year, y = pctChange)) +
+  geom_col(position = 'dodge') +
+  #scale_y_continuous(labels = scales::percent) +
+  #facet_wrap(~  species, scale = 'free_y', ncol = 7) + 
+  facet_wrap(~  species, ncol = 10, nrow = 8) + 
+  theme_bw() +
+  labs(title = 'Percent change per Year') +
+  theme(panel.grid.major = element_blank(),
+        axis.text.y = element_text(angle = 90, hjust = 0.5, vjust = 0.5),
+        axis.text.x = element_text(angle = 90, vjust = 0.5)) + 
+  labs(y =' % change') 
+
+ggsave(plot = plot, filename = glue('./graphs/maps/ratio/test_{spc}.png'),
+       units = 'in', width = 12, height = 9, dpi = 700)       
+
+loli<- ggplot(data = change, aes(x = Year, y = pctChange, color = gc)) +
+  geom_point(size = 4) +
+  geom_segment(aes(x = Year, y = 0, xend = Year, yend= pctChange), 
+               color = 'grey50', size = 1) +
+  theme_light() +
+  theme(panel.grid.major.x = element_blank(),
+        panel.border = element_blank(),
+        axis.ticks.x = element_blank())+
+  xlab('') +
+  ylab('% change') +
+  facet_wrap(~ species, scale = 'free') 
+
+ggsave(plot = loli, filename = glue('./graphs/maps/ratio/lolitest_{spc}.png'),
+       units = 'in', width = 12, height = 9, dpi = 700) 
 
