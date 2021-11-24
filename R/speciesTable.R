@@ -1,13 +1,20 @@
-speciesTable <- function(stack){
-  message(crayon::green ('Creating data frame for:',  ))
+speciesTable <- function(list, 
+                         species, 
+                         gcm){
+  
+  message(crayon::green ('Creating data table for:', sp))
+  dtEachSp <- data.table(pixelID = 1:ncell(sp), getValues(sp))
+  dtEachSp <- na.omit(dtEachSp)
+  retrun(dtEachSp)
     
-    allStack <- flatten(meanStack)
-    allStack <- stack(allStack)
-    names(allStack) <- gsub('mean_', '', names(allStack))
-   
-    allTble <- rasterToPoints(allStack, spatial = FALSE)
-    allTble <- as_tibble(allTble)
-    
-    return(allTble)
 }
- 
+
+unlist(allStack)
+
+dtSp <- lapply(X = allStack, FUN = function(sp){
+  dtEachSp <- data.table(pixelID = 1:ncell(sp), getValues(sp))
+  dtEachSp <- na.omit(dtEachSp)
+  return(dtEachSp)
+})
+
+allSpDT <- rbindlist(dtSp, fill = T, use.names = T)
