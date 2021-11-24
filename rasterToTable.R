@@ -15,7 +15,7 @@ spcs <- basename(dirs)
 raster_to_table <- function(spc){
   
   # Proof
-  #spc <- spcs[2] # Run and comment (after)
+spc <- spcs[2] # Run and comment (after)
 
   dir <- grep(spc, dirs, value = TRUE)
   fls <- fs::dir_ls(dir, regexp = '.tif$')
@@ -36,6 +36,7 @@ raster_to_table <- function(spc){
     tr <- terra::rast(fl)
     tb <- terra::as.points(tr)
     df <- terra::as.data.frame(x = tb)
+    df$pixelID  <- 1:ncell(tb)
     names(df) <- paste0('y', yrs)
     
     gm <- terra::geom(tb)
