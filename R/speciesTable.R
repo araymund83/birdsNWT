@@ -16,3 +16,4 @@ dtSp <- lapply(X = allStack, FUN = function(sp){
   return(dtEachSp)
 })
  
+allSpDT <- rbindlist(dtSp, fill = T, use.names = T)
