@@ -3,7 +3,7 @@
 require(pacman)
 pacman::p_load(raster, rgdal, rgeos, future, furrr, reproducible, RColorBrewer, 
                colorspace, ggspatial, ggpubr, gridExtra, terra, stringr, glue, 
-               sf, tidyverse, RStoolbox, fs, future.apply, fst, trend)
+               sf, tidyverse, RStoolbox, fs, future.apply, fst, trend, qs)
 
 g <- gc(reset = TRUE)
 rm(list = ls())
@@ -15,9 +15,9 @@ root <- './outputs'
 spcs <- dir_ls(root) 
 
 # Make difference ---------------------------------------------------------
-make_difference <- function(spc){
+make_community <- function(spc){
   
-  spc <- spcs[1]
+  #spc <- spcs[1]
   
   cat('Start ', spc, '\n')
   fls <- dir_ls(grep(spc, spcs, value = TRUE))
@@ -32,11 +32,11 @@ make_difference <- function(spc){
   lapply(1:length(gcm), function(i){
     cat('Start ', gcm[i], '\n')
     stk <- raster::stack(grep(gcm[i], fls, value = TRUE))
-    dfr <- stk[[2]] - stk[[1]]
-    tbl <- as_tibble(rasterToPoints(dfr))
-    names(tbl) <- c('x', 'y', paste0('diff_', basename(spc), '_', gcm[i]))
-    out <- glue('./tables/qs/diff_{basename(spc)}_{gcm[i]}.qs')
-    qsave(x = tbl, file = out)
+    tbl <- as_tibble(rasterToPoints(stk))
+    names(tbl) <- c('x', 'y', paste0('before_', basename(spc), '_', gcm[i]), 
+                    paste0('after_', basename(spc), '_', gcm[i]))
+    out <- glue('./tables/qs/comm/community_{basename(spc)}_{gcm[i]}.qs')
+    qs::qsave(x = tbl, file = out)
     cat('Done!\n')
   })
   
@@ -45,6 +45,6 @@ make_difference <- function(spc){
 }
 
 # Apply the function ------------------------------------------------------
-lapply(spcs, make_difference)
+comm <- lapply(spcs, make_community)
   
 
