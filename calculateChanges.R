@@ -28,7 +28,7 @@ plot(st_geometry(limt))
 
 
 logRatio_rasters <- function(spc){
-  #spc <- spcs[1] # Run and comment (after)
+  spc <- spcs[27] # Run and comment (after)
   cat('Start ', spc, '\n')
   dir <- grep(spc, dirs, value = TRUE)
   fle <- fs::dir_ls(dir, regexp = '.qs')
@@ -45,6 +45,9 @@ logRatio_rasters <- function(spc){
   tbl <- mutate(tbl, ratio = (y2091/y2011))
   tbl <- mutate(tbl, logRatio = log2(ratio))
   tbl <- mutate(tbl, gc = as.factor(gc))
+  
+  #tst <- tbl %>%  filter(gc == 'CCSM4') %>% dplyr::select(lon, lat, logRatio) %>% rasterFromXYZ()
+  ## para verificar que los datos se comportan de esa manera, y no hay error de indexacion.
   
   qs::qsave(x = tbl, file = glue('./qs/{spc}_table_ratio.qs'))
     

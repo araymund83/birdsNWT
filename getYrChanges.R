@@ -2,7 +2,7 @@
 library(pacman)
 
 pacman::p_load(glue, raster, rgdal, rgeos, readxl, stringr, sf, R.filesets,
-               tidyverse, terra, foreach, fs, future.apply, furrr, fst,gg
+               tidyverse, terra, foreach, fs, future.apply, furrr, fst,
                stringr, glue, compiler, hrbrthemes, gtools, hrbrthemes, colorspace)
 
 rm(list = ls())
@@ -14,7 +14,7 @@ spcs <- basename(dirs)
 
 files <- fs::dir_ls('./qs')
 files <- grep('changes', files, value = TRUE)
-#dat_list <- lapply(files, qs::qread)
+dat_list <- lapply(files, qs::qread)
 #saveRDS(dat_list,'./tables/qs/changesTables.RDS')
 
 # Read list of changes Tables ---------------------------------------------
@@ -66,6 +66,7 @@ change <- long %>%
 #qs::qsave(change, file = glue('./tables/yr_changeTable.qs'))
 
 change <- qs::qread('./tables/yr_changeTable.qs')
+change <- change %>%  replace_na((list( pctChange = 0)))
 
 make_loliPlot <- function(sp){
  #sp <- spcs[1]
@@ -75,9 +76,8 @@ make_loliPlot <- function(sp){
    message(crayon::green('Making lolipop plot for:', sp))  
   
   loliplot <- ggplot(data = subd, aes(x = Year, y = pctChange))+ 
-    geom_point(size = 3, aes(col = gc, group = gc)) + 
-    geom_segment(
-      aes(x = Year, y = 0, xend = Year, yend = pctChange, group = gc, 
+    geom_point(size = 8, aes(col = gc, group = gc)) + 
+    geom_segment(aes(x = Year, y = 0, xend = Year, yend = pctChange, group = gc, 
           colour = gc), size = 1) + 
     geom_hline(yintercept = 0, color = 'black', size = 0.5)+
     scale_y_continuous(labels = scales::percent) +
