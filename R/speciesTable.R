@@ -15,5 +15,5 @@ dtSp <- lapply(X = allStack, FUN = function(sp){
   dtEachSp <- na.omit(dtEachSp)
   return(dtEachSp)
 })
- 
+
 allSpDT <- rbindlist(dtSp, fill = T, use.names = T)
