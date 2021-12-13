@@ -17,8 +17,8 @@ loadMeanRas<- function(species,
  gcmAvailable <- map(.x = 1:length(gcm), .f = function(gc){
     message(crayon::green('Creating time series for', gc))
     files <- grep(gcm[gc], allFiles, value = TRUE)
-    gcmFiles <- lapply(files, raster)
-    gcmStack <- stack(gcmFiles)
+    gcmFiles <- lapply(files, raster::raster)
+    gcmStack <- raster::stack(gcmFiles)
   
   })
  names(gcmAvailable) <- gcm
