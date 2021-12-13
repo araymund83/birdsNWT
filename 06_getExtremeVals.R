@@ -50,5 +50,5 @@ rsl <- bind_rows(rsl)
 qs::qsave(x = rsl, file = glue('./qs/quantil/all_qntl.rds'))
 #saveRDS(object = rsl, file = './outputs/rds/all_qntl.rds')
 
-rsl <- readRDS(file = './outputs/rds/all_qntl.rds')
+rsl <- readRDS(file = './qs/quantil/all_qntl.rds')
 rsl <- mutate(rsl, intervals = round(intervals, digits = 3))

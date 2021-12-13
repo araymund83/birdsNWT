@@ -15,7 +15,7 @@ spcs <- basename(dirs)
 raster_to_table <- function(spc){
   
   # Proof
-  #spc <- spcs[2] # Run and comment (after)
+  spc <- spcs[2] # Run and comment (after)
   cat('Start ', spc, '\n')
   dir <- grep(spc, dirs, value = TRUE)
   fls <- fs::dir_ls(dir, regexp = '.tif$')
