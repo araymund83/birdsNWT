@@ -22,8 +22,21 @@ gcm<- paste(c('CanESM2', 'CCSM4', 'INM-CM4'), collapse = '|')  #There are other 
 years <- paste(c(2011, 2031,2051,2071,2091, 2100), collapse = "|")
 
 pathData <- './outputs'
-
-
+#residents
+residents <- c('ATTW', 'BBWO', 'BCCH', 'BOCH', 'CORA', 'GRAJ', 'PIWO', 'RBNU',
+               'RUGR')
+#short distant migrants
+sdm <- c('AMCR', 'AMRO', 'ATSP', 'BHCO', 'BHVI', 'BRBL', 'BRCR', 'CHSP', 'DEJU',
+         'FOSP', 'GCKI', 'HETH', 'HOLA', 'LCSP', 'LEYE', 'LISP','NOFL', 'OCWA',
+         'PAWA', 'PUFI', 'RCKI', 'RUBL', 'RWBL' ,'SAVS', 'SOSP', 'SWSP', 'TRES',
+         'VATH', 'WCSP', 'WIWR', 'WTSP', 'YBSA', 'YRWA')
+#neotropical migrants
+nm <- c('ALFL', 'AMRE', 'BARS', 'BAWW', 'BBWA', 'BLPW', 'BTNW', 'CAWA', 'CCSP', 
+        'CONW', 'COYE', 'EAKI' ,'GCTH', 'HAFL', 'LEFL', 'MAWA', 'NOWA' , 'OSFL',
+        'OVEN', 'PHVI', 'RBGR', 'REVI','SWTH', 'TEWA', 'WAVI', 'WETA', 'WEWP',
+        'WIWA', 'YBFL', 'YEWA')
+#nomadic
+nomadic <- c('EVGR', 'PISI', 'WWCR')
 
 
 birdPredictions <- downloadBirdPredictions(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c",
