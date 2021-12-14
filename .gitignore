@@ -11,5 +11,6 @@ qs/
 *.png
 tables/
 rds/
+*.rds
 
 
