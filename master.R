@@ -1,7 +1,8 @@
-species <- c('AMRO', 'LEYE')
+species <- c('BLPW')
 
 library(pacman)
-pacman::p_load(raster, rgdal, rgeos, reproducible, readxl, stringr, sf, tidyverse, terra, foreach, fs, data.table)
+pacman::p_load(raster, rgdal, rgeos, reproducible, readxl, stringr, sf, 
+               tidyverse, terra, foreach, fs, data.table)
 
 
 species <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP")
@@ -21,7 +22,7 @@ species <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP", "ATTW", "BARS", "BAWW",
 gcm<- paste(c('CanESM2', 'CCSM4', 'INM-CM4'), collapse = '|')  #There are other two options for GCM: 'CanESM2', 'CCSM4' and 'INM-CM4'
 years <- paste(c(2011, 2031,2051,2071,2091, 2100), collapse = "|")
 
-pathData <- './outputs'
+pathData <- './inputs/predictions'
 #residents
 residents <- c('ATTW', 'BBWO', 'BCCH', 'BOCH', 'CORA', 'GRAJ', 'PIWO', 'RBNU',
                'RUGR')
@@ -40,18 +41,22 @@ nomadic <- c('EVGR', 'PISI', 'WWCR')
 
 
 birdPredictions <- downloadBirdPredictions(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c",
-                                           birdsList = paste(birdList, collapse = "|"),
+                                           birdsList = paste(species, collapse = "|"),
                                            yearAnalysis = paste(c(2011, 2100), collapse = "|"),
                                            #climateScenario = "CanESM2",
                                            dataPath = pathData
+                                           
                                            )
 birdPredictions <- downloadPredRas(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c",
-                                           birdsList = paste(birdList, collapse = "|"),
+                                           birdsList = paste(species, collapse = "|"),
                                            #yearAnalysis = paste(c(2011, 2100), collapse = "|"),
                                            #climateScenario = "CanESM2",
                                           rastersPath =pathData
                                             )
 
+birdPred <- loadBirdPredictions(birdList = species,
+                                pathData = pathData
+                                )
 meanStack <- loadMeanRas(species = species,
                          pathData = pathData,
                          pattern = 'mean')

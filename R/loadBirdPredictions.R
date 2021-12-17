@@ -3,7 +3,7 @@ loadBirdPredictions<- function(birdList,
                                climateScenario = NULL,
                                year = NULL){
    predictionsPath <- checkPath(file.path(pathData), create = TRUE)
-   browser()
+
    message(crayon::green(paste0("Looking for files in ", predictionsPath)))
    
    # fls <- dir_ls(path = './outputs', regexp = '.tif$')
