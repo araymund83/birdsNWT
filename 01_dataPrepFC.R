@@ -17,7 +17,7 @@ print(spcs)
 
 # Making an example for one specie ----------------------------
 make_average_reps <- function(sp){
-  # sp <- spcs[4]
+  sp <- spcs[14]
   cat('Start\n', sp, '\n')
   fls <- fs::dir_ls(sp) #lista archivos
   dir <- sp # directorio de trabajo
@@ -34,7 +34,7 @@ make_average_reps <- function(sp){
   nvt <- nvt %>% dplyr::select(specie, year, gcm) # nvt va tener 6 columnas pero me interesan solo 3
   dst <- nvt %>% distinct(specie, year, gcm)  #elimina datos duplicados divididos en specie, year, gcm   
   
-  cat('To create the average\n')
+  cat('Calculating the mean of all replicates \n')
   
   rsl <- map(.x = 1:nrow(dst), .f = function(k){
     
