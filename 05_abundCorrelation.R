@@ -1,7 +1,7 @@
 # Load libraries
 require(pacman)
 p_load(raster, rgdal, rgeos, stringr, tidyverse, qs, fs, glue, ggrepel)
-
+options(scipen = 999)
 
 # Load data  --------------------------------------------------------------
 #this internal function allow you to sums all pixeles 
@@ -84,22 +84,19 @@ make_graph <- function(data){
     geom_point(aes(color = gcm, shape = gcm), 
                size = 1.5, alpha = 0.8) +
     scale_color_manual(values = c( "#FF6A00","#C15CCB",  "#00868B")) +
-    # geom_text_repel(
-    #   aes(label = specie),
-    #   family = "Poppins",
-    #   size = 3,
-    #   min.segment.length = 0, 
-    #   seed = 42, 
-    #   box.padding = 0.5,
-    #   max.overlaps = Inf,
-    #   arrow = arrow(length = unit(0.010, "npc")),
-    #   nudge_x = .15,
-    #   nudge_y = .5,
-    #   color = "grey50"
-    # ) + 
-    geom_label(label = tble$specie,
-              nudge_x = 0.5, nudge_y = 0.5,
-             check_overlap = T) +
+    geom_text_repel(aes(label = specie), size = 3,
+      # min.segment.length = 0,
+      # seed = 42,
+      # box.padding = 0.5,
+      # max.overlaps = Inf,
+      # arrow = arrow(length = unit(0.010, "npc")),
+      # nudge_x = .15,
+      # nudge_y = .5,
+      color = "grey50"
+    ) +
+    # geom_label(label = tble$specie,
+    #           nudge_x = 0.5, nudge_y = 0.5,
+    #          check_overlap = T) +
     #scale_color_manual(values = c(CanESM2 = '#FF6A00', CCSM4 = '#C15CCB', INM.CM4 = '#00868B')) + 
     #geom_text(aes(x = 40000000, y = 20000000, label = glue('r = {corl[1,2]}')), col = '#BC679B') +
     #geom_text(aes(x = 40000000, y = 19000000, label = glue('r = {corl[2,2]}')), col = '#3E51E3') +
@@ -115,7 +112,7 @@ make_graph <- function(data){
    
     labs(x = 2011, y = 2091, col = 'GCM')
   
-  ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/scatterPlot3_{gcm[gc]}.png'),  ## the notation is not scientific
+  ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/scatterPlotPoints_{gcm[gc]}.png'),  ## the notation is not scientific
          units = 'in', width = 12, height = 9, dpi = 700)
   
   return(gsct)
