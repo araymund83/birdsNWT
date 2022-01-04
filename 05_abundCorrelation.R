@@ -88,7 +88,7 @@ make_graph <- function(data){
       # min.segment.length = 0,
       # seed = 42,
       # box.padding = 0.5,
-      # max.overlaps = Inf,
+      #max.overlaps = Inf,
       # arrow = arrow(length = unit(0.010, "npc")),
       # nudge_x = .15,
       # nudge_y = .5,
