@@ -1,3 +1,6 @@
+#The aim of this script is to convert the  bird density rasters to a probability 
+##of occurrence. 
+##
 # Load libraries ----------------------------------------------------------
 require(pacman)
 pacman::p_load(raster, rcartocolor, rgdal, rgeos, future, furrr, reproducible, RColorBrewer, 
@@ -17,7 +20,7 @@ spcs <- basename(dirs)
 # Function -----------------------------------------------------------------
 get_probOcc <- function(spc){
   
- # spc <- spcs[1] # Run and erase
+ #spc <- spcs[1] # Run and erase
   dir <- grep(spc, dirs, value = TRUE)
   fls <- fs::dir_ls(dir, regexp = '.tif$')
   fls <- fls <- grep('mean', fls, value = TRUE)
@@ -42,9 +45,11 @@ get_probOcc <- function(spc){
       sfl <- grep(yrs[yr], fl, value = TRUE)
       rst <- raster::raster(sfl)
       dps <- calc(x = rst, fun = function(pxl){1- dpois(x = 0, lambda = pxl)})
-      out <- glue('./outputs/{spc}/ocurr')
+      out <- glue('./outputs/{spc}/occur')
       ifelse(!dir.exists(out), dir.create(out, recursive = TRUE), print('Folder already exist'))
-      writeRaster(x = dps, filename = glue('./outputs/{spc}/ocurr/occu_{gcm[k]}_{yrs[yr]}.tif'), overwrite = TRUE)
+      writeRaster(x = dps, 
+                  filename = glue('./outputs/{spc}/occur/occu_{spc}_{yrs[yr]}_{gcm[k]}.tif'),
+                  overwrite = TRUE)
       cat('Done!\n')
    })
  })

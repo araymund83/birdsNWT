@@ -1,15 +1,22 @@
+##the aim of this script is to create the pairwise comparison between yr1 (eg.2011)
+##and yr2 (eg. 2091) and gcm's. 
+##it gets the sum of all pixels per species
+
+g <- gc(reset = TRUE)
+rm(list = ls())
+
 # Load libraries
 require(pacman)
 p_load(raster, rgdal, rgeos, stringr, tidyverse, qs, fs, glue, ggrepel)
 options(scipen = 999)
 
 # Load data  --------------------------------------------------------------
-#this internal function allow you to sums all pixeles 
+#this internal function allow you to sums all pixels 
 
 makeSum <- function(rasterStack){
-   rasList = lapply(X = meanStack, FUN = function(stack){
+   rasList = lapply(X = rasterStack, FUN = function(stack){
       sumRas <- lapply(stack, FUN = function(x){
-      message(crayon::blue('Calculating sum'))
+      message(crayon::blue('Calculating sum for:', stack))
       ras <- cellStats(x, sum, na.rm = TRUE) 
      })
    return(sumRas)
@@ -17,7 +24,7 @@ makeSum <- function(rasterStack){
    return(rasList)
 }
 
-data <- makeSum(meanStack)
+data <- makeSum(occStack)
 
 
 
@@ -32,21 +39,21 @@ data <- map(1:length(data), function(k){
 })
 data <- bind_rows(data) |> as_tibble()
 
-#multiply for 6.25 ha (250 * 250 pixel resolution)
+#multiply for 6.25 ha (250 * 250 pixel resolution) when working with densities
 data <- data |> 
-  mutate(value = value * 6.25) |> 
-  separate(col = name, into = c('mean', 'specie', 'year', 'gcm'), sep = '_')
+  mutate(value = mean * 6.25) |> 
+  separate(col = name, into = c('sum', 'specie', 'year', 'gcm'), sep = '_')
 
 
 data <- data |> 
-  dplyr::select(-mean)
-qs::qsave(x = data, file = './tables/totalAbundance.qs')
-abundance <- qs::qread('./tables/totalAbundance.qs')
+  dplyr::select(-sum)
+qs::qsave(x = data, file = './tables/totalProbOcc.qs')
+abundance <- qs::qread('./tables/totalProbOcc.qs')
 
 # Making the scatterplot -------------------------------------------------
 
-# x <- 2011
-# y <- 2091
+x <- 2011
+y <- 2031
 #Make comparisons between gcms
 # gcm1 - gcm2 
 # gcm1 - gcm3
@@ -54,25 +61,25 @@ abundance <- qs::qread('./tables/totalAbundance.qs')
 
 # A simple scatterplot 
 data <- data |> 
-  filter(year %in% c(2011, 2091)) |> 
+  filter(year %in% c(2011, 2031)) |> 
   spread(year, value) |> 
-  setNames(c('specie', 'gcm', 'y2011', 'y2091'))
+  setNames(c('specie', 'gcm', 'y2011', 'y2031'))
 
-data <- qs::qread(file = './tables/totalAbundance1191.qs')
+data <- qs::qread(file = './tables/totalProbOcc1191.qs')
 
 
 # Functions ---------------------------------------------------------------
 make_graph <- function(data){
   
   yr1 <- '2011'
-  yr2 <- '2091'
+  yr2 <- '2031'
   gcm <- unique(data$gcm)
   corrTable <- map(.x = 1:length(gcm), .f = function(gc){
     message(crayon::green('Loading files for', gcm[gc]))
     tble <- data |> filter(gcm == gcm[gc])
     corl <- tble |> 
       group_by(gcm) |> 
-      summarise(corr = cor(y2011, y2091, method = 'pearson')) |> 
+      summarise(corr = cor(y2011, y2031, method = 'pearson')) |> 
       ungroup() |> 
       mutate(corr = round(corr, 2))
   
@@ -80,7 +87,7 @@ make_graph <- function(data){
   cat('Making the correlation graph\n')
   
   gsct <- ggplot(data = tble, 
-                 aes(x = y2011, y = y2091, col = gcm)) + 
+                 aes(x = y2011, y = y2031, col = gcm)) + 
     geom_point(aes(color = gcm, shape = gcm), 
                size = 1.5, alpha = 0.8) +
     scale_color_manual(values = c( "#FF6A00","#C15CCB",  "#00868B")) +
@@ -110,9 +117,9 @@ make_graph <- function(data){
           aspect.ratio = 1,
           legend.position = 'none') +
    
-    labs(x = 2011, y = 2091, col = 'GCM')
+    labs(x = 2011, y = 2031, col = 'GCM')
   
-  ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/scatterPlotPoints_{gcm[gc]}.png'),  ## the notation is not scientific
+  ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/scatter_occur_{gcm[gc]}.png'),  ## the notation is not scientific
          units = 'in', width = 12, height = 9, dpi = 700)
   
   return(gsct)

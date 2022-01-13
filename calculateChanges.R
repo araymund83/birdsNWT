@@ -28,11 +28,11 @@ plot(st_geometry(limt))
 
 
 logRatio_rasters <- function(spc){
-  spc <- spcs[27] # Run and comment (after)
+  #spc <- spcs[27] # Run and comment (after)
   cat('Start ', spc, '\n')
   dir <- grep(spc, dirs, value = TRUE)
   fle <- fs::dir_ls(dir, regexp = '.qs')
-  tbl <- qs::qread(file = glue('./outputs/{spc}/tbl_yrs_{spc}.qs'))
+  tbl <- qs::qread(file = glue('./outputs/{spc}/occur/occ_yrs_{spc}.qs'))
   tbl <- dplyr::select(tbl, x, y, gc, everything())
   names(tbl)[1:2] <- c('lon', 'lat')
   tbl <- mutate(tbl, avg = rowMeans(tbl[,4:9]))
@@ -49,12 +49,12 @@ logRatio_rasters <- function(spc){
   #tst <- tbl %>%  filter(gc == 'CCSM4') %>% dplyr::select(lon, lat, logRatio) %>% rasterFromXYZ()
   ## para verificar que los datos se comportan de esa manera, y no hay error de indexacion.
   
-  qs::qsave(x = tbl, file = glue('./qs/{spc}_table_ratio.qs'))
+  qs::qsave(x = tbl, file = glue('./qs/{spc}_occu_change.qs'))
     
-  cat('Making a ratio map for:', spc, '\n')
+  cat('Making a change map for:', spc, '\n')
   ggRatio <- ggplot() +
-    geom_tile(data = tbl, aes(x = lon, y = lat, fill = logRatio)) +
-    scale_fill_binned_diverging(palette= 'Blue-Red', name = expression('log'[2]~'ratio'), rev = TRUE, n.breaks = 5) +
+    geom_tile(data = tbl, aes(x = lon, y = lat, fill = change)) +
+    scale_fill_binned_diverging(palette= 'Blue-Red', rev = TRUE, n.breaks = 5) +
     facet_wrap(. ~ gc, ncol = 3, nrow = 1) +
     #geom_tile(aes(fill = logRatio)) +
     geom_sf(data = limt, fill = NA, col = '#999999') +
@@ -68,12 +68,12 @@ logRatio_rasters <- function(spc){
           axis.text.y = element_text(angle = 90, vjust = 0.5)) +
     labs(x = 'Longitude', y = 'Latitude')
   
-  ggsave(plot = ggRatio,filename = glue('./graphs/maps/ratio/gcm_ratio_{spc}.png'),
+  ggsave(plot = ggRatio,filename = glue('./graphs/maps/ratio/occu_change_{spc}.png'),
          units = 'in', width = 12, height = 9, dpi = 700)
  }
 
 # Apply the function -----------------------------------------------------
-map(spcs, logRatio_rasters)
+map(spcs[31:75], logRatio_rasters)
 
 # files <- fs::dir_ls('./qs')
 # files <- grep('changes', files, value = TRUE)

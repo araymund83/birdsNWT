@@ -1,7 +1,7 @@
 # Load libraries ----------------------------------------------------------
 require(pacman)
 pacman::p_load(parallel, foreach, doSNOW,raster, rgdal, rgeos, reproducible, RColorBrewer, ggspatial, 
-               ggpubr, gridExtra, terra, stringr, glue, sf, tidyverse, 
+               ggpubr, gridExtra, stringr, glue, sf, tidyverse, fasterize,
                RStoolbox, fs, fst, trend, colorspace, hrbrthemes,exactextractr, furrr, future, spatialEco)
 
 g <- gc(reset = TRUE)
@@ -29,7 +29,7 @@ plot(st_geometry(limt))
 # Function to use ---------------------------------------------------------
 see_changes <- function(spc){
   
- #spc <- spcs[1]
+ spc <- spcs[1]
   cat('-------------------------------------------------------------\n')
   cat('To start ', spc, '\n')
   cat('-------------------------------------------------------------\n')

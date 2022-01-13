@@ -8,10 +8,10 @@ loadOccRas<- function(species,
 
   rasAvailable <- lapply(X = species, FUN = function(sp){
     message(crayon::green('Loading files for', sp))
-    subdir<-glue(pathData,'/',sp,'/ocurr')
+    subdir<-glue(pathData,'/',sp,'/occur')
     allFiles <- list.files(path = subdir, pattern = pattern, 
                            full.names = TRUE)
-    gcm <- str_sub(basename(allFiles), start = 6, end = nchar(basename(allFiles)) - 9)
+    gcm <- str_sub(basename(allFiles), start = 16, end = nchar(basename(allFiles)) - 4)
     gcm <- unique(gcm)
     
     gcmAvailable <- map(.x = 1:length(gcm), .f = function(gc){

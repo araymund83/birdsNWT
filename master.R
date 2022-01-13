@@ -22,7 +22,7 @@ species <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP", "ATTW", "BARS", "BAWW",
 gcm<- paste(c('CanESM2', 'CCSM4', 'INM-CM4'), collapse = '|')  #There are other two options for GCM: 'CanESM2', 'CCSM4' and 'INM-CM4'
 years <- paste(c(2011, 2031,2051,2071,2091, 2100), collapse = "|")
 
-pathData <- './inputs/predictions'
+pathData <- './outputs'
 #residents
 residents <- c('ATTW', 'BBWO', 'BCCH', 'BOCH', 'CORA', 'GRAJ', 'PIWO', 'RBNU',
                'RUGR')
@@ -60,8 +60,11 @@ birdPred <- loadBirdPredictions(birdList = species,
 meanStack <- loadMeanRas(species = species,
                          pathData = pathData,
                          pattern = 'mean')
+occStack <- loadOccRas(species = species,
+                         pathData = pathData,
+                         pattern = 'occu')
 
-names(meanStack) <- species
+names(occStack) <- species
 
 flatten(meanStack)                             
 
