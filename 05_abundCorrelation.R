@@ -35,35 +35,35 @@ data <- map(data, rownames_to_column) ## pass the rownames to column names
 
 data <- map(1:length(data), function(k){
   data[[k]] |> 
-    setNames(c('name', 'value'))
+    setNames(c('name', 'sum'))
 })
 data <- bind_rows(data) |> as_tibble()
 
 #multiply for 6.25 ha (250 * 250 pixel resolution) when working with densities
 data <- data |> 
-  mutate(value = mean * 6.25) |> 
+  mutate(total = sum * 6.25) |> 
   separate(col = name, into = c('sum', 'specie', 'year', 'gcm'), sep = '_')
 
 
-data <- data |> 
+sum <- data |> 
   dplyr::select(-sum)
-qs::qsave(x = data, file = './tables/totalProbOcc.qs')
+qs::qsave(x = sum, file = './tables/totalProbOcc.qs')
 abundance <- qs::qread('./tables/totalProbOcc.qs')
 
 # Making the scatterplot -------------------------------------------------
 
 x <- 2011
-y <- 2031
+y <- 2071
 #Make comparisons between gcms
 # gcm1 - gcm2 
 # gcm1 - gcm3
 # gcm2 - gcm3
 
 # A simple scatterplot 
-data <- data |> 
-  filter(year %in% c(2011, 2031)) |> 
-  spread(year, value) |> 
-  setNames(c('specie', 'gcm', 'y2011', 'y2031'))
+sum <- abundance |> 
+  filter(year %in% c(2011, 2071)) |> 
+  spread(year, total) |> 
+  setNames(c('specie', 'gcm', 'y2011', 'y2071'))
 
 data <- qs::qread(file = './tables/totalProbOcc1191.qs')
 
@@ -72,14 +72,14 @@ data <- qs::qread(file = './tables/totalProbOcc1191.qs')
 make_graph <- function(data){
   
   yr1 <- '2011'
-  yr2 <- '2031'
+  yr2 <- '2071'
   gcm <- unique(data$gcm)
   corrTable <- map(.x = 1:length(gcm), .f = function(gc){
     message(crayon::green('Loading files for', gcm[gc]))
     tble <- data |> filter(gcm == gcm[gc])
     corl <- tble |> 
       group_by(gcm) |> 
-      summarise(corr = cor(y2011, y2031, method = 'pearson')) |> 
+      summarise(corr = cor(y2011, y2071, method = 'pearson')) |> 
       ungroup() |> 
       mutate(corr = round(corr, 2))
   
@@ -87,7 +87,7 @@ make_graph <- function(data){
   cat('Making the correlation graph\n')
   
   gsct <- ggplot(data = tble, 
-                 aes(x = y2011, y = y2031, col = gcm)) + 
+                 aes(x = y2011, y = y2071, col = gcm)) + 
     geom_point(aes(color = gcm, shape = gcm), 
                size = 1.5, alpha = 0.8) +
     scale_color_manual(values = c( "#FF6A00","#C15CCB",  "#00868B")) +
@@ -117,9 +117,9 @@ make_graph <- function(data){
           aspect.ratio = 1,
           legend.position = 'none') +
    
-    labs(x = 2011, y = 2031, col = 'GCM')
+    labs(x = 2011, y = 2071, col = 'GCM')
   
-  ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/scatter_occur_{gcm[gc]}.png'),  ## the notation is not scientific
+  ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/scatter_occur1171_{gcm[gc]}.png'),  ## the notation is not scientific
          units = 'in', width = 12, height = 9, dpi = 700)
   
   return(gsct)
@@ -131,7 +131,7 @@ gcms <- unique(data$gcm)
 g1g2 <- make_graph(gcm1 = gcms[1], gcm2 = gcms[2])
 g1g3 <- make_graph(gcm1 = gcms[1], gcm2 = gcms[3])
 g2g3 <- make_graph(gcm1 = gcms[2], gcm2 = gcms[3])
-corPlot <- make_graph(data = data)
+corPlot <- make_graph(data = sum)
 
 # Join all into only one
 gall <- ggpubr::ggarrange(g1g2, g2g3, g2g3, ncol = 1, nrow = 3)

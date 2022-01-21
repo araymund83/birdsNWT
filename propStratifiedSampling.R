@@ -74,24 +74,7 @@ smpls <- dir_ls('./qs/sample')
 smpls
 smpls <- map(smpls, qread)
 
-nrw <- map(smpls, nrow) %>% unlist() %>% as.numeric() 
-which(nrw == 0)
-dir_ls('./qs/sample')[which(nrw == 0)]
 
-miss <- parse_number(dir_ls('./qs/sample')[which(nrw == 0)])
-
-
-
-# Masking
-cntr <- fstr %>% 
-  rasterToPoints() %>% 
-  as_tibble() %>% 
-  setNames(c('x', 'y', 'value')) %>% 
-  group_by(value) %>% 
-  summarise(count = n()) %>% 
-  ungroup() 
-
-as.data.frame(cntr)
 
 # Intersection 
 mask_poly <- raster::rasterToPolygons(mask)

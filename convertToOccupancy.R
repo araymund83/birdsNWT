@@ -34,12 +34,12 @@ get_probOcc <- function(spc){
     message(crayon::green('Loading files for', gcm[k]))
     fl <- grep(gcm[k], fls, value = TRUE)
     fl <- as.character(fl)
-    # stk <- raster::stack(fl)
-    # dps <- calc(x = stk, fun = function(pxl){1- dpois(x = 0, lambda = pxl)})
-    # ou <- glue('./outputs/{spc}/occur/occu_{spc}_{gcm}.tif')
-    # dr <- dirname(name)
-    # writeRaster(x = dps, filename = ou[k], overwrite = TRUE )
-    # 
+    stk <- raster::stack(fl)
+    dps <- calc(x = stk, fun = function(pxl){1- dpois(x = 0, lambda = pxl)})
+    ou <- glue('./outputs/{spc}/occur/occu_{spc}_{gcm}.tif')
+    dr <- dirname(name)
+    writeRaster(x = dps, filename = ou[k], overwrite = TRUE )
+
     proOccRas<-  map(.x = 1:length(yrs), .f = function(yr){
       message(crayon::green('Year', yrs[yr]))
       sfl <- grep(yrs[yr], fl, value = TRUE)

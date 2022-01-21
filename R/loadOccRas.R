@@ -1,8 +1,8 @@
 loadOccRas<- function(species, 
-                       pathData,
-                       pattern, 
-                       gcm= NULL,
-                       years = NULL){
+                      pathData,
+                      pattern, 
+                      gcm= NULL,
+                      years = NULL){
   
   pathData <- reproducible::checkPath(file.path(pathData), create = TRUE)
 
