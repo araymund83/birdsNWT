@@ -2,10 +2,13 @@ species <- c('BLPW')
 
 library(pacman)
 pacman::p_load(raster, rgdal, rgeos, reproducible, readxl, stringr, sf, 
-               tidyverse, terra, foreach, fs, data.table)
+               tidyverse, terra, foreach, fs, data.table, qs, glue)
 
 
 species <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP")
+#TODO::Ask TATI if these species were preselected and why
+speciesOfInterest <- c("NOWA", "FOSP", "HOLA", "OSFL", "PISI", "SWSP", "TEWA", "WEWP", 
+                       "WWCR", "ATSP", "BOCH", "COYE", "CAWA", "REVI", "WCSP")
 
 #complete list of species from google drive
 species <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP", "ATTW", "BARS", "BAWW",

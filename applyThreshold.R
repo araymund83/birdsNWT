@@ -82,7 +82,7 @@ dout <- './graphs/figs/occur'
 # Function table to raster ------------------------------------------------
 tbl2rst <- function(fle){
   
-  fle <- fles[1] # Run and erase (after)
+  #fle <- fles[1] # Run and erase (after)
   cat('Start ', basename(fle), '\n')
   tbl <- qs::qread(fle)
   spc <- basename(fle) %>% str_split(., '_') %>% sapply(., `[[`, 3) %>% gsub('.qs', '', .) 
@@ -107,41 +107,40 @@ tbl2rst <- function(fle){
   #rsl <- mutate(rsl, class = ifelse(change < 0, 'Loss', ifelse(change == 0, 'No change', 'Gain')))
   #rsl <- mutate(rsl, class = factor(class, levels = c('Loss', 'No change', 'Gain')))
   pal <- wesanderson::wes_palette('Zissou1', 100, type = 'continuous')
-  fill_range <- seq(min())
-  range(rsl$change)
+  colours = c("#FFFFFF", "#9999FF", "#66FFFF", "#66FFCC", "#99FF33", "#FFFF33", 
+              "#FFCC33", "#FF9900", "#FF6600", "#FF0000", "#CC0000")
+  
   cat('To make the map\n')
   ggp <- ggplot() +
     geom_tile(data = rsl, aes(x = x, y = y, fill = change)) + 
-    #scale_fill_distiller(palette = 'Spectral',
-     #                    limits = c(min(rsl$change), max(rsl$change))) +
-    #scale_fill_manual(values = c('#2596be', '#b87180', '#c8c8c8')) +
-    # scale_fill_gradientn(colors = c('#b87180', '#c8c8c8', '#2596be'),
-    #                                   values = scales::rescale(c(-0.5, -0.1, 0, 0.1, 0.5))) +
-    scale_fill_gradientn(colors = c('#b87180', '#c8c8c8', '#c8c8c8', '#c8c8c8','#2596be'),
-                         breaks = ) +
-    # scale_fill_gradient2(low = 'red', mid = 'grey', high = '#2596be',
-    #                       midpoint = 0, na.value = 'grey50', guide = 'colourbar') +
-                      
-      #low = '#c8c8c8', high = 'blue',
-       #                 limit = c(min(rsl$change), max(rsl$change))) +
+    geom_sf(data = limt, fill = NA, col = '#c8c8c8') +
+    scale_fill_distiller(palette = 'RdBu',
+                         type = 'div',
+                         limits = c(-1, 1) * max(abs(rsl$change)),
+                         #limits = c(min(rsl$change), max(rsl$change))* max(abs(rsl$change)),
+                         direction = + 1,
+                         guide= 'colourbar') +
     facet_wrap(.~gc, ncol = 3, nrow = 1) + 
-    labs(x = 'Longitude', y = 'Latitude', title = {spc}, fill = '') +
+    ggtitle(label = spc) +
+    labs(x = 'Longitude', y = 'Latitude') +
     theme_bw() + 
     theme(panel.grid.major = element_blank(), 
           panel.grid.minor = element_blank(), 
           axis.text.y = element_text(angle = 90, hjust = 0.5), 
-          plot.title = element_text(size = 16, hjust = 0.5), 
+          plot.title = element_text(size = 14, face = 'bold'), 
           legend.position = 'bottom', 
           legend.key.width = unit(1.5, 'cm')) +
     coord_sf()
   
-  dou <- glue('./graphs/maps/occur/{spc}/map_change5_{spc}.png')
-  ggsave(plot = ggp, filename = dou, units = 'in', width = 12, height = 9, dpi = 300)
+  dou <- glue('./graphs/figs/occur/{spc}/occ_change_{spc}.png')
+  ggsave(plot = ggp, filename = dou, units = 'in', width = 12, 
+         height = 9, dpi = 700)
   cat('------ Done ------!\n')
-  
 }
 
+# Apply the function ------------------------------------------------------
+rslt <- map(.x = fles, .f = tbl2rst)
   
-}
+
 
 

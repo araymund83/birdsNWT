@@ -28,7 +28,7 @@ plot(st_geometry(limt))
 
 
 logRatio_rasters <- function(spc){
-  #spc <- spcs[27] # Run and comment (after)
+  spc <- spcs[2] # Run and comment (after)
   cat('Start ', spc, '\n')
   dir <- grep(spc, dirs, value = TRUE)
   fle <- fs::dir_ls(dir, regexp = '.qs')
@@ -54,7 +54,8 @@ logRatio_rasters <- function(spc){
   cat('Making a change map for:', spc, '\n')
   ggRatio <- ggplot() +
     geom_tile(data = tbl, aes(x = lon, y = lat, fill = change)) +
-    scale_fill_binned_diverging(palette= 'Blue-Red', rev = TRUE, n.breaks = 5) +
+    #scale_fill_binned_diverging(palette= 'Blue-Red', rev = TRUE, n.breaks = 5) +
+    scale_fill_gradientn(colours = #D73027','#f4f4f4', '#1A9870')
     facet_wrap(. ~ gc, ncol = 3, nrow = 1) +
     #geom_tile(aes(fill = logRatio)) +
     geom_sf(data = limt, fill = NA, col = '#999999') +
