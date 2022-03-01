@@ -7,7 +7,7 @@ pacman::p_load(glue, raster, rgdal, rgeos, readxl, stringr, sf, R.filesets,
 rm(list = ls())
 
 # Load data ---------------------------------------------------------------
-fles <- dir_ls('./qs/zonal', regexp = 'log')
+fles <- dir_ls('./qs/zonal', regexp = 'log2')
 
 # Function ----------------------------------------------------------------
 make_graph <- function(fle){

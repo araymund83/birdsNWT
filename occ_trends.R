@@ -28,8 +28,8 @@ raster_to_table <- function(spc){
   yrs <- na.omit(yrs)
   gcm <- str_sub(basename(fls), start = 16, end = nchar(basename(fls)) - 4)
   gcm <- unique(gcm)
-  thr <- filter(thrs, spec == spc)
-  vle <- unique(thr$pOccMean)
+  #thr <- filter(thrs, spec == spc)
+ # vle <- unique(thr$pOccMean)
   
   cat('Raster to table\n')
   dfm <- map(.x = 1:length(gcm), .f = function(k){

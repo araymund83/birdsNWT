@@ -5,6 +5,7 @@ pacman::p_load(raster, rgdal, rgeos, terra, stringr, glue, sf, tidyverse, RStool
 
 g <- gc(reset = TRUE)
 rm(list = ls())
+
 options(scipen = 999)
 
 # Load data ---------------------------------------------------------------
@@ -88,12 +89,12 @@ tbl2rst <- function(fle){
     cat(i, '\n')
     tb <- filter(tbl, gc == i)
     colnames(tb) <- c('x', 'y', 'y2011', 'y2031', 'y2051', 'y2071', 'y2091', 'y2100', 'gc')
-    tb <- mutate(tb, change = y2091 - y2011) #ratio = (y2091/y2011), logRatio = log2(ratio))
+    tb <- mutate(tb, change = y2031 - y2011) #ratio = (y2091/y2011), logRatio = log2(ratio))
     tb <- dplyr::select(tb, -gc)
     tr <- terra::rast(tb[1:9], type = 'xyz')
     do <- glue('{dout}/{spc}')
     ifelse(!dir.exists(do), dir_create(do), print('Directory already exists'))
-    terra::writeRaster(x = tr, filename = glue('{do}/occ_change_msk_{spc}_{i}.tif'), overwrite = TRUE)
+    terra::writeRaster(x = tr, filename = glue('{do}/occ_change_msk1131_{spc}_{i}.tif'), overwrite = TRUE)
     cat('Done!\n')
     return(tb[,c(1, 2, 9)])
   })
@@ -131,7 +132,7 @@ tbl2rst <- function(fle){
     coord_sf()
   
   
-  dou <- glue('./graphs/figs/occur/{spc}/occ_change2_{spc}.png')
+  dou <- glue('./graphs/figs/occur/{spc}/occ_change11_31_{spc}.png')
   ggsave(plot = ggp, filename = dou, units = 'in', width = 12, 
          height = 9, dpi = 700)
   cat('------ Done ------!\n')

@@ -24,7 +24,7 @@ makeSum <- function(rasterStack){
    return(rasList)
 }
 
-data <- makeSum(occStack)
+data <- makeSum(meanStack)
 
 
 
@@ -47,13 +47,13 @@ data <- data |>
 
 sum <- data |> 
   dplyr::select(-sum)
-qs::qsave(x = sum, file = './tables/totalProbOcc.qs')
-abundance <- qs::qread('./tables/totalProbOcc.qs')
+qs::qsave(x = sum, file = './tables/totalAbundance.qs')
+abundance <- qs::qread('./tables/totalAbundance.qs')
 
 # Making the scatterplot -------------------------------------------------
 
 x <- 2011
-y <- 2071
+y <- 2031
 #Make comparisons between gcms
 # gcm1 - gcm2 
 # gcm1 - gcm3
@@ -61,33 +61,33 @@ y <- 2071
 
 # A simple scatterplot 
 sum <- abundance |> 
-  filter(year %in% c(2011, 2071)) |> 
-  spread(year, total) |> 
-  setNames(c('specie', 'gcm', 'y2011', 'y2071'))
+  filter(year %in% c(2011, 2031)) |> 
+  spread(year, value) |> 
+  setNames(c('specie', 'gcm', 'y2011', 'y2031'))
 
-data <- qs::qread(file = './tables/totalProbOcc1191.qs')
+data <- qs::qread(file = './tables/totalAbundance1191.qs')
 
 
 # Functions ---------------------------------------------------------------
 make_graph <- function(data){
   
   yr1 <- '2011'
-  yr2 <- '2071'
+  yr2 <- '2031'
   gcm <- unique(data$gcm)
   corrTable <- map(.x = 1:length(gcm), .f = function(gc){
     message(crayon::green('Loading files for', gcm[gc]))
     tble <- data |> filter(gcm == gcm[gc])
     corl <- tble |> 
       group_by(gcm) |> 
-      summarise(corr = cor(y2011, y2071, method = 'pearson')) |> 
+      summarise(corr = cor(y2011,y2031, method = 'pearson')) |> 
       ungroup() |> 
       mutate(corr = round(corr, 2))
-  
+ 
   
   cat('Making the correlation graph\n')
   
   gsct <- ggplot(data = tble, 
-                 aes(x = y2011, y = y2071, col = gcm)) + 
+                 aes(x = y2011, y = y2031, col = gcm)) + 
     geom_point(aes(color = gcm, shape = gcm), 
                size = 1.5, alpha = 0.8) +
     scale_color_manual(values = c( "#FF6A00","#C15CCB",  "#00868B")) +
@@ -108,7 +108,12 @@ make_graph <- function(data){
     #geom_text(aes(x = 40000000, y = 20000000, label = glue('r = {corl[1,2]}')), col = '#BC679B') +
     #geom_text(aes(x = 40000000, y = 19000000, label = glue('r = {corl[2,2]}')), col = '#3E51E3') +
     #geom_smooth(method = 'lm', se = TRUE) +
-    geom_abline() +
+    geom_abline(intercept = 0, slope = 1, colour = 'black') +
+    geom_abline( intercept = 5000000, colour = 'darkgrey', linetype = 'dashed') +
+    geom_abline( intercept = -5000000, colour = 'darkgrey', linetype = 'dashed') +
+    geom_abline( intercept = 2000000, colour = 'darkgrey', linetype = 'dotted') +
+    geom_abline( intercept = -2000000, colour = 'darkgrey', linetype = 'dotted') +
+    #geom_ribbon(aes(ymin = 0 + y2011 *1.9, ymax = 0 + y2011 *2.1), fill = 'grey50')+
     ggtitle(label = gcm[gc]) +
     #theme_ipsum_es() + 
     theme_bw() +
@@ -116,10 +121,9 @@ make_graph <- function(data){
           axis.text.y = element_text(angle = 90, vjust = 0.5,  hjust = 0.5),
           aspect.ratio = 1,
           legend.position = 'none') +
-   
-    labs(x = 2011, y = 2071, col = 'GCM')
+    labs(x = 2011, y = 2031, col = 'GCM')
   
-  ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/scatter_occur1171_{gcm[gc]}.png'),  ## the notation is not scientific
+  ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/scatter_abund1131dashed_{gcm[gc]}.png'),  ## the notation is not scientific
          units = 'in', width = 12, height = 9, dpi = 700)
   
   return(gsct)
@@ -127,12 +131,10 @@ make_graph <- function(data){
 }
 
 # Apply the function ------------------------------------------------------
-gcms <- unique(data$gcm)
+years <- unique(data$gcm)
 g1g2 <- make_graph(gcm1 = gcms[1], gcm2 = gcms[2])
 g1g3 <- make_graph(gcm1 = gcms[1], gcm2 = gcms[3])
 g2g3 <- make_graph(gcm1 = gcms[2], gcm2 = gcms[3])
-corPlot <- make_graph(data = sum)
 
-# Join all into only one
-gall <- ggpubr::ggarrange(g1g2, g2g3, g2g3, ncol = 1, nrow = 3)
-ggsave(plot = gall, filename = './graphs/figs/corr_graph.png', units = 'in', width = 9, height = 17, dpi = 700)
+gall <- ggpubr::ggarrange(g1g2, g2g3, g2g3, ncol = 3, nrow = 1)
+ggsave(plot = gall, filename = './graphs/figs/scatter/corr_graph1131.png', units = 'in', width = 9, height = 17, dpi = 700)

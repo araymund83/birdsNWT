@@ -67,6 +67,7 @@ occStack <- loadOccRas(species = species,
                          pathData = pathData,
                          pattern = 'occu')
 
+
 names(occStack) <- species
 
 flatten(meanStack)                             

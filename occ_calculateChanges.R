@@ -8,12 +8,16 @@ pacman::p_load(glue, raster, rgdal, rgeos, readxl, stringr, sf, R.filesets,
 rm(list = ls())
 
 # Load data ---------------------------------------------------------------
+thrs <- read_csv('./inputs/prevOcc.csv')
 root <- './outputs'
 dirs <- fs::dir_ls(root, type = 'directory')
 spcs <- basename(dirs)
-limt <- sf::st_read('inputs/NT1_BCR6/NT1_BCR6_poly.shp') 
+dirs <- glue('{dirs}/occur')
+dirs <- as.character(dirs)
 
-ecrg <- sf::st_read('inputs/ecoregions/ecoregions.shp')
+limt <- sf::st_read('inputs/NT1_BCR6/NT1_BCR6_poly.shp') 
+ecrg <- sf::st_read('inputs/ecoregions/EcoRegions_NWT_gov/ecoRegionsNT1_BCR6.shp')
+
 
 targetCRS <- paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
                    "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")
@@ -22,7 +26,6 @@ targetCRS <- paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
 plot(st_geometry(ecrg))
 limt <- sf::st_transform(x = limt, crs = targetCRS)
 ecrg <- sf::st_transform(x = ecrg, crs = targetCRS)
-ecrg_limt <- sf::st_intersection(x = ecrg, y = limt)
 plot(st_geometry(ecrg_limt))
 plot(st_geometry(limt))
 
@@ -32,12 +35,16 @@ calcChange_rasters <- function(spc){
   cat('Start ', spc, '\n')
   dir <- grep(spc, dirs, value = TRUE)
   fle <- fs::dir_ls(dir, regexp = '.qs')
-  tbl <- qs::qread(file = glue('./outputs/{spc}/occur/tblmsk_yrs_{spc}.qs'))
+  tbl <- qs::qread(file = glue('./outputs/{spc}/occur/occ_yrs_{spc}.qs'))
   tbl <- dplyr::select(tbl, x, y, gc, everything())
   names(tbl)[1:2] <- c('lon', 'lat')
   tbl <- mutate(tbl, avg = rowMeans(tbl[,4:9]))
   tbl <- as_tibble(tbl)
   gcm <- unique(tbl$gc)
+  tbl <- tbl %>% mutate(pixelID = 1:nrow(tbl))
+  tbl <- select(tbl, -c(lon, lat))
+  
+  tblLong <- tbl %>% pivot_longer( !c(gc,pixelID), names_to = 'year', values_to = 'value')
  
   cat('Estimating change from initial (2011) and final (2091) year\n')
   tbl <- mutate(tbl, change = y2091 - y2011 )  #change 2100 for 2091
@@ -53,13 +60,13 @@ calcChange_rasters <- function(spc){
     
   cat('Making a change map for:', spc, '\n')
   ggRatio <- ggplot() +
-    geom_tile(data = tbl, aes(x = lon, y = lat, fill = change)) +
+    geom_tile(data = tblLong, aes(x = lon, y = lat, fill = value)) +
     #scale_fill_binned_diverging(palette= 'Blue-Red', rev = TRUE, n.breaks = 5) +
     scale_fill_gradientn(colours = '#D73027','#f4f4f4' ,'#1A9870') +
     facet_wrap(. ~ gc, ncol = 3, nrow = 1) +
     #geom_tile(aes(fill = logRatio)) +
     geom_sf(data = limt, fill = NA, col = '#999999') +
-    geom_sf(data = ecrg_limt, fill = NA, col = '#bfbfbf') +
+    geom_sf(data = ecrg, fill = NA, col = '#bfbfbf') +
     #scale_fill_manual(values = c('#D73027','#f4f4f4', '#1A9870')) + ## change green from #1A9850
     ggtitle(label = spc) +
     #theme_ipsum_es() +
@@ -69,7 +76,7 @@ calcChange_rasters <- function(spc){
           axis.text.y = element_text(angle = 90, vjust = 0.5)) +
     labs(x = 'Longitude', y = 'Latitude')
   
-  ggsave(plot = ggRatio,filename = glue('./graphs/maps/ratio/occu_change_{spc}.png'),
+  ggsave(plot = ggRatio,filename = glue('./graphs/maps/ratio/pcc_yrs_{spc}.png'),
          units = 'in', width = 12, height = 9, dpi = 700)
  }
 

@@ -67,7 +67,7 @@ change <- long %>%
 
 change <- qs::qread('./tables/yr_changeTable.qs')
 change <- change %>%  replace_na((list( pctChange = 0)))
-
+group.colors <- c(CanESM2 = '#FF6A00', CCSM4 = '#C15CCB', INM.CM4 = '#00868B')
 make_loliPlot <- function(sp){
  #sp <- spcs[1]
   subd <- filter(change, species == sp)
@@ -77,6 +77,7 @@ make_loliPlot <- function(sp){
   
   loliplot <- ggplot(data = subd, aes(x = Year, y = pctChange))+ 
     geom_point(size = 8, aes(col = gc, group = gc)) + 
+    scale_color_manual(values = c( "#FF6A00","#C15CCB",  "#00868B")) +
     geom_segment(aes(x = Year, y = 0, xend = Year, yend = pctChange, group = gc, 
           colour = gc), size = 1) + 
     geom_hline(yintercept = 0, color = 'black', size = 0.5)+
@@ -85,14 +86,17 @@ make_loliPlot <- function(sp){
     theme_bw() +
     ggtitle(label = sp) +
     theme(plot.title = element_text(size = 14, face = 'bold'),
+          text= element_text(size =14),
           panel.grid.major.x = element_blank(),
           panel.grid.major.y = element_blank(),
-          axis.text.x = element_text(angle = 90, hjust = 0.5),
+          axis.text.y = element_text(size = 13), 
+          axis.text.x = element_text(size = 13,angle = 90, hjust = 0.5),
           legend.position = 'none') +
-    labs( y = '% change', x = 'Year') +
-    scale_x_discrete(labels = years)
+    labs( y = 'Change (%)', x = 'Year') +
+    scale_x_discrete(labels = years) 
+
   
-  ggsave(plot = loliplot, filename = glue('./graphs/figs/yrChange/lolipopPlot_{sp}.png'),
+  ggsave(plot = loliplot, filename = glue('./graphs/figs/yrChange/Pctchange_{sp}.png'),
          units = 'in', width = 12, height = 9, dpi = 700)
   return(loliplot)
 }

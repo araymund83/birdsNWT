@@ -15,7 +15,7 @@ dirs <- fs::dir_ls(root, type = 'directory')
 spcs <- basename(dirs)
 
 meansTable <- function(spc){
-  #spc <- spcs[4] # Run and comment (after)
+spc <- spcs[4] # Run and comment (after)
   message(crayon::blue('Starting table for', spc, '\n'))
   dir <- grep(spc, dirs, value = TRUE)
   fle <- fs::dir_ls(dir, regexp = '.qs')

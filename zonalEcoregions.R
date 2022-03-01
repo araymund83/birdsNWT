@@ -13,7 +13,7 @@ fles <- dir_ls('./qs', regexp = 'table_ratio')
 
 limt <- sf::st_read('inputs/NT1_BCR6/NT1_BCR6_poly.shp') 
 
-ecrg <- sf::st_read('inputs/ecoregions/ecoregions.shp')
+ecrg <- sf::st_read('inputs/ecoregions/EcoRegions_NWT_gov/ecoRegionsNT1_BCR6.shp')
 
 targetCRS <- paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
                    "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")
@@ -28,7 +28,7 @@ plot(st_geometry(ecrg_limt))
 # Function ----------------------------------------------------------------
 get_max_min <- function(fle){
   
-  fle <- fles[1]
+  #fle <- fles[1]
   cat('Start\n')
   spc <- str_sub(basename(fle), 1, 4)
   qst <- qs::qread(fle)
@@ -38,13 +38,14 @@ get_max_min <- function(fle){
     
     cat(gcm[k], '\n')
     tbl <- filter(qst, gc == gcm[k])
-    tbl <- dplyr::select(tbl, lon, lat, logRatio)
+    tbl <- dplyr::select(tbl, lon, lat, change, logRatio)
     rst <- rasterFromXYZ(tbl)
     # plot(rst) # Run and erase
     crs(rst) <- targetCRS
-    znl.avg <- exactextractr::exact_extract(rst, ecrg_limt, 'mean')
-    znl.sdt <- exactextractr::exact_extract(rst, ecrg_limt, 'stdev')
-    dfm <- data.frame(region = pull(ecrg_limt, 'REGION_NAM'), average = znl.avg, sdt = znl.sdt)
+    znl.avg <- exactextractr::exact_extract(rst, ecrg, 'mean')
+    znl.sdt <- exactextractr::exact_extract(rst, ecrg, 'stdev')
+    dfm <- data.frame(region = pull(ecrg, 'ECO3_NAM_1'), average = znl.avg, sdt = znl.sdt)
+    
     dfm <- as_tibble(dfm)
     dfm <- mutate(dfm, model = gcm[k])
     cat('Done ', gcm[k], '\n')
@@ -52,7 +53,7 @@ get_max_min <- function(fle){
     
   })
   rsl <- bind_rows(rsl)
-  qs::qsave(x = rsl, file = glue('./qs/zonal/{spc}_logZonal.qs'))
+  qs::qsave(x = rsl, file = glue('./qs/zonal/{spc}_logZonal2.qs'))
   cat('Done!\n')
   return(rsl)
 }
