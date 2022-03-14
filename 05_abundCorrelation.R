@@ -91,7 +91,7 @@ make_graph <- function(data){
     geom_point(aes(color = gcm, shape = gcm), 
                size = 1.5, alpha = 0.8) +
     scale_color_manual(values = c( "#FF6A00","#C15CCB",  "#00868B")) +
-    geom_text_repel(aes(label = specie), size = 3,
+    geom_text_repel(aes(label = specie), size = 5,
       # min.segment.length = 0,
       # seed = 42,
       # box.padding = 0.5,
@@ -109,11 +109,12 @@ make_graph <- function(data){
     #geom_text(aes(x = 40000000, y = 19000000, label = glue('r = {corl[2,2]}')), col = '#3E51E3') +
     #geom_smooth(method = 'lm', se = TRUE) +
     geom_abline(intercept = 0, slope = 1, colour = 'black') +
-    geom_abline( intercept = 5000000, colour = 'darkgrey', linetype = 'dashed') +
-    geom_abline( intercept = -5000000, colour = 'darkgrey', linetype = 'dashed') +
-    geom_abline( intercept = 2000000, colour = 'darkgrey', linetype = 'dotted') +
-    geom_abline( intercept = -2000000, colour = 'darkgrey', linetype = 'dotted') +
-    #geom_ribbon(aes(ymin = 0 + y2011 *1.9, ymax = 0 + y2011 *2.1), fill = 'grey50')+
+    geom_abline(intercept = 0, slope = 0.5, colour = 'blue', linetype = 'dashed') +
+    geom_abline(intercept = 0, slope = 0.2, colour = 'red', linetype = 'dashed') +
+    #geom_abline( intercept = 5000000, colour = 'darkgrey', linetype = 'dashed') +
+    #geom_abline( intercept = -5000000, colour = 'darkgrey', linetype = 'dashed') +
+    #geom_abline( intercept = 2000000, colour = 'darkgrey', linetype = 'dotted') +
+    #geom_abline( intercept = -2000000, colour = 'darkgrey', linetype = 'dotted') +
     ggtitle(label = gcm[gc]) +
     #theme_ipsum_es() + 
     theme_bw() +
@@ -121,9 +122,10 @@ make_graph <- function(data){
           axis.text.y = element_text(angle = 90, vjust = 0.5,  hjust = 0.5),
           aspect.ratio = 1,
           legend.position = 'none') +
+    scale_y_continuous(labels = scales::scientific)+
     labs(x = 2011, y = 2031, col = 'GCM')
   
-  ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/scatter_abund1131dashed_{gcm[gc]}.png'),  ## the notation is not scientific
+  ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/abun_correlationnewslopes1131_{gcm[gc]}.png'),  ## the notation is not scientific
          units = 'in', width = 12, height = 9, dpi = 700)
   
   return(gsct)
