@@ -67,6 +67,7 @@ y <- 2031
 # gcm2 - gcm3
 
 # A simple scatterplot 
+colnames(traits2)<- c('Group', 'specie', 'Family')
 abundance <- left_join(abundance, traits2,by= 'specie' )
 sum <- abundance |> 
   filter(year %in% c(2011, 2031)) |> 
@@ -97,8 +98,8 @@ make_graph <- function(data){
     gsct <- tble %>%  ggplot(aes(x = y2011, y = y2031, color = Group)) + 
       geom_point(aes(color = Group, shape = Group), 
                  size = 2, alpha = 0.8) +
-      #scale_color_manual(values = c( "#FF6A00","#C15CCB",  "#00868B")) +
-      geom_text_repel(aes(label = specie), size = 4,
+      scale_color_manual(values = c( "#FF6A00","#C15CCB",  "#00868B")) +
+      ggrepel::geom_text_repel(aes(label = specie), size = 4,
                       # min.segment.length = 0,
                       # seed = 42,
                       # box.padding = 0.5,
@@ -115,12 +116,12 @@ make_graph <- function(data){
       #geom_text(aes(x = 40000000, y = 20000000, label = glue('r = {corl[1,2]}')), col = '#BC679B') +
       #geom_text(aes(x = 40000000, y = 19000000, label = glue('r = {corl[2,2]}')), col = '#3E51E3') +
       #geom_smooth(method = 'lm', se = TRUE) +
-      geom_text(aes(label = 'Predicted Abundance'))
+      geom_text(aes(label = 'Predicted Abundance'))+
       geom_abline(intercept = 0, slope = 1, colour = 'black') +
-      geom_abline( intercept = 5000000, colour = 'darkgrey', linetype = 'dashed') +
-      geom_abline( intercept = -5000000, colour = 'darkgrey', linetype = 'dashed') +
-      geom_abline( intercept = 2000000, colour = 'darkgrey', linetype = 'dotted') +
-      geom_abline( intercept = -2000000, colour = 'darkgrey', linetype = 'dotted') +
+      geom_abline( intercept = 0, slope = 0.5,colour = 'darkgrey', linetype = 'dashed') +
+     # geom_abline( intercept = -5000000, colour = 'darkgrey', linetype = 'dashed') +
+      geom_abline( intercept = 0, slope = 0.2, colour = 'darkgrey', linetype = 'dotted') +
+      #geom_abline( intercept = -2000000, colour = 'darkgrey', linetype = 'dotted') +
       ggtitle(label = gcm[gc]) +
       theme_bw() +
       scale_x_continuous(labels = scales::comma) +
@@ -135,7 +136,7 @@ make_graph <- function(data){
       labs(x = 2011, y = 2031, col = 'Group') +
       
     
-    ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/scatter_abund1131dashed3_{gcm[gc]}.png'),  ## the notation is not scientific
+    ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/scatter_abund1131newslope_{gcm[gc]}.png'),  ## the notation is not scientific
            units = 'in', width = 12, height = 9, dpi = 700)
     
     return(gsct)
@@ -155,4 +156,4 @@ gall<- gall + plot_layout(guides = 'collect')
 
 
 
-ggsave(plot = gall, filename = './graphs/figs/scatter/corr_graph1131.png', units = 'in', width = 9, height = 17, dpi = 700)
+ggsave(plot = gall, filename = './graphs/figs/scatter/corr_graph1131_slopnew.png', units = 'in', width = 9, height = 17, dpi = 700)
