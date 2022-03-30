@@ -1,3 +1,14 @@
+##this script calculates the mean  of the 5 replicates for each species/gcm/year
+
+# Load libraries --------------------------------------------
+library(pacman)
+
+pacman::p_load(glue, raster, rgdal, rgeos, readxl, stringr, sf, 
+               tidyverse, terra, foreach, fs, future.apply, furrr, fst, glue, compiler)
+
+rm(list = ls())
+
+
 # create table for plotting rate of change --------------------------------
 totalTable <- qs::qread(file = glue('./tables/totalTable.qs'))
 
@@ -13,24 +24,23 @@ cumm_change <- long %>%
   group_by(gc, species) %>% 
   mutate(Total = Value * 6.25,
          lag =lag(Total),
-         change = (Total - lag) *100 /lag ,
+         change = (Total - lag) * 100 /lag ,
          First = head(Total, 1),
          cumChange = case_when(Total != First ~(Total - First) * 100/First,
                                TRUE ~ 1 * NA)) %>% 
   select(Year, gc, Total, change,cumChange) %>% 
   ungroup()
- view(cumm_change)
- 
-
 
 qs::qsave(cumm_change, file = glue('./tables/cumm_changeTable.qs'))
+write.csv(change, './tables/abundcumm_changeTable.csv')
 
 change <- qs::qread('./tables/cumm_changeTable.qs')
 change <- change %>%  replace_na((list(cumChange = 0)))
 change <- change %>% group_by(gc,species)
+qs::qsave(cumm_change, file = glue('./tables/cumm_changeTable.qs'))
 group.colors <- c(CanESM2 = '#FF6A00', CCSM4 = '#C15CCB', INM.CM4 = '#00868B')
 make_loliPlot <- function(sp){
-  sp <- spcs[1]
+  #sp <- spcs[1]
   subd <- filter(change, species == sp)
   years <- c('2011', '2031', '2051', '2071','2091','2100')
   
