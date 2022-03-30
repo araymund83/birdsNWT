@@ -8,7 +8,7 @@ rm(list = ls())
 # Load libraries
 require(pacman)
 p_load(raster, rgdal, rgeos, stringr, tidyverse, qs, fs, glue, ggrepel)
-options(scipen = 999)
+#options(scipen = 999) ## use only if you want to not use scientific notation
 
 # Load data  --------------------------------------------------------------
 #this internal function allow you to sums all pixels 
@@ -25,6 +25,7 @@ makeSum <- function(rasterStack){
 }
 
 data <- makeSum(meanStack)
+
 
 
 
@@ -47,7 +48,7 @@ data <- data |>
 
 sum <- data |> 
   dplyr::select(-sum)
-qs::qsave(x = sum, file = './tables/totalAbundance.qs')
+qs::qsave(x = sum, file = './tables/totalAbundance72_spp.qs')
 abundance <- qs::qread('./tables/totalAbundance.qs')
 
 # Making the scatterplot -------------------------------------------------
@@ -69,10 +70,11 @@ data <- qs::qread(file = './tables/totalAbundance1191.qs')
 
 
 # Functions ---------------------------------------------------------------
+# Functions ---------------------------------------------------------------
 make_graph <- function(data){
   
   yr1 <- '2011'
-  yr2 <- '2031'
+  yr2 <- '2091'
   gcm <- unique(data$gcm)
   corrTable <- map(.x = 1:length(gcm), .f = function(gc){
     message(crayon::green('Loading files for', gcm[gc]))
@@ -82,61 +84,61 @@ make_graph <- function(data){
       summarise(corr = cor(y2011,y2031, method = 'pearson')) |> 
       ungroup() |> 
       mutate(corr = round(corr, 2))
- 
-  
-  cat('Making the correlation graph\n')
-  
-  gsct <- ggplot(data = tble, 
-                 aes(x = y2011, y = y2031, col = gcm)) + 
-    geom_point(aes(color = gcm, shape = gcm), 
-               size = 1.5, alpha = 0.8) +
-    scale_color_manual(values = c( "#FF6A00","#C15CCB",  "#00868B")) +
-    geom_text_repel(aes(label = specie), size = 5,
-      # min.segment.length = 0,
-      # seed = 42,
-      # box.padding = 0.5,
-      #max.overlaps = Inf,
-      # arrow = arrow(length = unit(0.010, "npc")),
-      # nudge_x = .15,
-      # nudge_y = .5,
-      color = "grey50"
-    ) +
-    # geom_label(label = tble$specie,
-    #           nudge_x = 0.5, nudge_y = 0.5,
-    #          check_overlap = T) +
-    #scale_color_manual(values = c(CanESM2 = '#FF6A00', CCSM4 = '#C15CCB', INM.CM4 = '#00868B')) + 
-    #geom_text(aes(x = 40000000, y = 20000000, label = glue('r = {corl[1,2]}')), col = '#BC679B') +
-    #geom_text(aes(x = 40000000, y = 19000000, label = glue('r = {corl[2,2]}')), col = '#3E51E3') +
-    #geom_smooth(method = 'lm', se = TRUE) +
-    geom_abline(intercept = 0, slope = 1, colour = 'black') +
-    geom_abline(intercept = 0, slope = 0.5, colour = 'blue', linetype = 'dashed') +
-    geom_abline(intercept = 0, slope = 0.2, colour = 'red', linetype = 'dashed') +
-    #geom_abline( intercept = 5000000, colour = 'darkgrey', linetype = 'dashed') +
-    #geom_abline( intercept = -5000000, colour = 'darkgrey', linetype = 'dashed') +
-    #geom_abline( intercept = 2000000, colour = 'darkgrey', linetype = 'dotted') +
-    #geom_abline( intercept = -2000000, colour = 'darkgrey', linetype = 'dotted') +
-    ggtitle(label = gcm[gc]) +
-    #theme_ipsum_es() + 
-    theme_bw() +
-    theme(plot.title = element_text(size = 14, face = 'bold'),
-          axis.text.y = element_text(angle = 90, vjust = 0.5,  hjust = 0.5),
-          aspect.ratio = 1,
-          legend.position = 'none') +
-    scale_y_continuous(labels = scales::scientific)+
-    labs(x = 2011, y = 2031, col = 'GCM')
-  
-  ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/abun_correlationnewslopes1131_{gcm[gc]}.png'),  ## the notation is not scientific
-         units = 'in', width = 12, height = 9, dpi = 700)
-  
-  return(gsct)
-})
+    
+    
+    cat('Making the correlation graph\n')
+    
+    gsct <- tble %>%  ggplot(aes(x = y2011, y = y2031, color = Group)) + 
+      geom_point(aes(color = Group, shape = Group), 
+                 size = 2, alpha = 0.8) +
+      #scale_color_manual(values = c( "#FF6A00","#C15CCB",  "#00868B")) +
+      ggrepel::geom_text_repel(aes(label = specie), size = 5,
+                               # min.segment.length = 0,
+                               # seed = 42,
+                               # box.padding = 0.5,
+                               #max.overlaps = Inf,
+                               # arrow = arrow(length = unit(0.010, "npc")),
+                               # nudge_x = .15,
+                               # nudge_y = .5,
+                               color = 'Grey30'
+      ) +
+      # geom_label(label = tble$specie,
+      #           nudge_x = 0.5, nudge_y = 0.5,
+      #          check_overlap = T) +
+      #scale_color_manual(values = c(CanESM2 = '#FF6A00', CCSM4 = '#C15CCB', INM.CM4 = '#00868B')) + 
+      #geom_text(aes(x = 40000000, y = 20000000, label = glue('r = {corl[1,2]}')), col = '#BC679B') +
+      #geom_text(aes(x = 40000000, y = 19000000, label = glue('r = {corl[2,2]}')), col = '#3E51E3') +
+      #geom_smooth(method = 'lm', se = TRUE) +
+      geom_abline(intercept = 0, slope = 1, colour = 'black') +
+      geom_abline(intercept = 0, slope = 0.5, colour = 'blue', linetype = 'dashed') +
+      geom_abline(intercept = 0, slope = 0.2, colour = 'red', linetype = 'dashed') +
+      geom_abline(intercept = 0, slope = 2, colour = 'green', linetype = 'dashed') +
+      ggtitle(label = gcm[gc]) +
+      theme_bw() +
+      scale_x_continuous(labels = scales::scientific) +
+      scale_y_continuous(labels = scales::scientific)+
+      theme(plot.title = element_text(size = 16, face = 'bold'),
+            axis.title.x = element_text(size = 18, face = 'bold'),
+            axis.title.y = element_text(size = 18, face = 'bold'),
+            axis.text.y = element_text(angle = 90, vjust = 0.5,  hjust = 0.5, size = 16),
+            axis.text.x = element_text(size = 16),
+            aspect.ratio = 1,
+            legend.position = 'bottom',
+            legend.text = element_text(size= 12)) +
+      labs(x = 2011, y = 2031, col = 'Group') 
+    
+    
+    ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/group_abund1131newslopes72_{gcm[gc]}.png'),  ## the notation is not scientific
+           units = 'in', width = 12, height = 9, dpi = 700)
+    
+    return(gsct)
+  })
 }
 
 # Apply the function ------------------------------------------------------
-years <- unique(data$gcm)
-g1g2 <- make_graph(gcm1 = gcms[1], gcm2 = gcms[2])
-g1g3 <- make_graph(gcm1 = gcms[1], gcm2 = gcms[3])
-g2g3 <- make_graph(gcm1 = gcms[2], gcm2 = gcms[3])
+corPlot <- make_graph(data = data)
 
-gall <- ggpubr::ggarrange(g1g2, g2g3, g2g3, ncol = 3, nrow = 1)
-ggsave(plot = gall, filename = './graphs/figs/scatter/corr_graph1131.png', units = 'in', width = 9, height = 17, dpi = 700)
+# Join all into only one
+gall <- ggpubr::ggarrange(corPlot, ncol = 1, nrow = 3)
+gall <- gridExtra::grid.arrange(grobs = corPlot)
+
