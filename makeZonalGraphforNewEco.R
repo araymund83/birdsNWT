@@ -18,11 +18,16 @@ spcs <- unique(spcs)
 
 # Make graph function -----------------------------------------------------
 make_graph <- function(spc){
-  #spc <- spcs[1]
+ # spc <- spcs[1]
   cat(spc, '\t')
   fle <- grep(spc, fles, value = TRUE)
   tbl <- qs::qread(fle)
   tbl <- as_tibble(tbl)
+  #convert tbl$region to a factor to order x axis by latitude
+  tbl<-  tbl %>% arrange(region) %>% 
+    mutate(region  = factor(region, levels = c('Mid-Boreal', 'High Boreal', 'Low Subarctic',
+                                              'High Subarctic', 'Low Arctic north')))
+
   gpn <- ggplot(data = tbl, aes(x = region, y = average, group = model, col = model)) +
     geom_point(size = 3) + 
     scale_color_manual(values = c('CanESM2' = "#FF6A00",'CCSM4' = "#C15CCB", 
