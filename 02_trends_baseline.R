@@ -1,7 +1,7 @@
 # Load libraries --------------------------------------------------------
 require(pacman)
 
-pacman::p_load(raster, rgdal, rgeos, terra, stringr, glue, sf, tidyverse, RStoolbox, fs, fst, trend)
+pacman::p_load(raster, rgdal, rgeos, terra, stringr, glue, sf, tidyverse, RStoolbox, fs, fst, spatialEco)
 
 g <- gc(reset = TRUE)
 rm(list = ls())
@@ -15,11 +15,11 @@ spcs <- basename(dirs)
 raster_to_table <- function(spc){
   
   # Proof
-  spc <- spcs[1] # Run and comment (after)
+ spc <- spcs[1] # Run and comment (after)
   cat('Start ', spc, '\n')
   dir <- grep(spc, dirs, value = TRUE)
   fls <- fs::dir_ls(dir, regexp = '.tif$')
-  fls <- grep('mean', fls, value = TRUE)
+  fls <- grep('baselineresample', fls, value = TRUE)
   yrs <- parse_number(basename(fls))
   yrs <- unique(yrs)
   yrs <- na.omit(yrs)
@@ -49,16 +49,26 @@ raster_to_table <- function(spc){
   rsl <- bind_rows(dfm)
   #browser
   #fst::write_fst(x = rsl, path = glue('./outputs/{spc}/tbl_yrs_{spc}.fst')) ## saving with .fst creates very big files! 
-  qs::qsave(x = rsl, file = glue('./outputs/{spc}/tbl_yrs_base72_{spc}.qs'))
+  qs::qsave(x = rsl, file = glue('./outputs/{spc}/tbl_2010_base72_{spc}.qs'))
   
   cat('------- Done -------\n')
   return(rsl)
   
 }
 ### Raster to table ---------------------------------------------------------
-dfrm <- map(.x = spcs, .f = raster_to_table)
+dfrm <- map(.x = spcs[52:72], .f = raster_to_table)
 dim(dfrm)
 object.size(dfrm)
 
 ## to read qs
-table<- qs::qread(file = glue('./outputs/{spc}/tbl_yrs_{spc}.qs'))
+tabl2<- qs::qread(file = glue('./outputs/ALFL/tbl_2010_base72_ALFL.qs'))
+tab1<- qs::qread(file = glue('./outputs/ALFL/tbl_yrs_ALFL.qs'))
+tabl<-tab1 %>% group_by(x, y)
+tb2 <- tabl2 %>% select(x, y, y2010) %>% group_by(x, y)
+
+test <- tab1 %>%  filter(gc == 'CanESM2') %>% select(x,y, y2031, y2091, gc) %>% 
+  group_by(x, y)
+
+diff_1031<- full_join(test, tb2, by_group = TRUE)
+
+dif_short <- diff_1031 %>% select(x, y, y2010, y2031, y2091, gc)
