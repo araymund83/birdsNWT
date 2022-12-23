@@ -55,7 +55,7 @@ logRatio_rasters <- function(spc){
   ggRatio <- ggplot() +
     geom_tile(data = tbl, aes(x = lon, y = lat, fill = change)) +
     #scale_fill_binned_diverging(palette= 'Blue-Red', rev = TRUE, n.breaks = 5) +
-    scale_fill_gradientn(colours = #D73027','#f4f4f4', '#1A9870')
+    scale_fill_gradientn(colours = '#D73027','#f4f4f4', '#1A9870') +
     facet_wrap(. ~ gc, ncol = 3, nrow = 1) +
     #geom_tile(aes(fill = logRatio)) +
     geom_sf(data = limt, fill = NA, col = '#999999') +
