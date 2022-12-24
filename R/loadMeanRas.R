@@ -5,7 +5,7 @@ loadMeanRas<- function(species,
                        years = NULL){
   
  pathData <- reproducible::checkPath(file.path(pathData), create = TRUE)
-  
+  browser()
  dirs <- fs::dir_ls(pathData, type = 'directory')
  meansAvailable <- lapply(X = species, FUN = function(sp){
    message(crayon::green('Loading files for', sp))
