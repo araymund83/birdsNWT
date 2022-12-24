@@ -1,7 +1,6 @@
 # Load libraries --------------------------------------------
 library(pacman)
-
-pacman::p_load(dplyr, ggplot2, glue,hrbrthemes, plotly,sf, stringr)
+pacman::p_load(dplyr, ggplot2, glue,hrbrthemes, plotly,sf, stringr, tidyr)
            
 g <- gc(reset = TRUE)
 rm(list = ls())
@@ -12,7 +11,10 @@ theme_set(theme_bw())
 change <- qs::qread('./tables/yr_changeTable.qs')
 totalTable <- qs::qread(file = glue('./tables/totalTable.qs'))
 abundance<- qs::qread( './tables/totalAbundance.qs')
+baseline<- qs::qread(file = './baseline/baseline_total_all.qs')
+colnames(baseline) <- c('specie', 'value', 'total', 'year', 'gc')
 
+abunAll <- abundance %>% left_join(baseline)
 sum <- abundance |> 
   filter(year %in% c(2011, 2091)) |> 
   spread(year, value) |> 
@@ -62,10 +64,11 @@ ggsave(plot = totalPlot, filename = glue('./graphs/figs/yrChange/totalGroup.png'
        units = 'in', width = 12, height = 9, dpi = 700)
 
 
-data <- left_join(sum, traits2, by = 'specie')
+data <- left_join(abundance, traits2, by = 'specie')
 
 # Making the scatterplot -------------------------------------------------
-
+#filter species 
+newSum <- abundance %>% filter(specie != 'BARS' & specie != 'NOFL', specie != 'PIWO')
 x <- 2011
 y <- 2031
 #Make comparisons between gcms
@@ -76,13 +79,14 @@ y <- 2031
 # A simple scatterplot 
 colnames(traits2)<- c('Group', 'specie', 'Family')
 abundance <- left_join(abundance, traits2,by= 'specie' )
-sum <- abundance |> 
-  filter(year %in% c(2011, 2091)) |> 
+sum <- newSum|> 
+  filter(year %in% c(2011, 2031)) |> 
   spread(year, value) |> 
-  setNames(c('specie', 'gcm', 'Group', 'Family', 'y2011', 'y2091'))
+  setNames(c('specie', 'gcm', 'Group', 'Family', 'y2011', 'y2031'))
 
 data <- qs::qread(file = './tables/totalAbundance1191.qs')
 data <-sum
+
 
 # Functions ---------------------------------------------------------------
 make_graph <- function(data){
@@ -95,14 +99,14 @@ make_graph <- function(data){
     tble <- data |> filter(gcm == gcm[gc])
     corl <- tble |> 
       group_by(gcm) |> 
-      summarise(corr = cor(y2011,y2091, method = 'pearson')) |> 
+      summarise(corr = cor(y2011,y2031, method = 'pearson')) |> 
       ungroup() |> 
       mutate(corr = round(corr, 2))
     
     
     cat('Making the correlation graph\n')
     
-    gsct <- tble %>%  ggplot(aes(x = y2011, y = y2091, color = Group)) + 
+    gsct <- tble %>%  ggplot(aes(x = y2011, y = y2031, color = Group)) + 
       geom_point(aes(color = Group, shape = Group), 
                  size = 2, alpha = 0.8) +
       #scale_color_manual(values = c( "#FF6A00","#C15CCB",  "#00868B")) +
@@ -110,7 +114,7 @@ make_graph <- function(data){
                       # min.segment.length = 0,
                       # seed = 42,
                       # box.padding = 0.5,
-                      #max.overlaps = Inf,
+                      max.overlaps = Inf,
                       # arrow = arrow(length = unit(0.010, "npc")),
                       # nudge_x = .15,
                       # nudge_y = .5,
@@ -139,10 +143,10 @@ make_graph <- function(data){
             aspect.ratio = 1,
             legend.position = 'bottom',
             legend.text = element_text(size= 12)) +
-      labs(x = 2011, y = 2091, col = 'Group') 
+      labs(x = 2011, y = 2031, col = 'Group') 
       
     
-    ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/group_abund1191newslopes72_{gcm[gc]}.png'),  ## the notation is not scientific
+    ggsave(plot = gsct, filename = glue('./graphs/figs/scatter/group_abund1131_test_{gcm[gc]}.png'),  ## the notation is not scientific
            units = 'in', width = 12, height = 9, dpi = 700)
     
     return(gsct)

@@ -2,25 +2,23 @@ species <- c('BLPW')
 
 library(pacman)
 pacman::p_load(raster, rgdal, rgeos, reproducible, readxl, stringr, sf, 
-               tidyverse, terra, foreach, fs, data.table, qs, glue)
+               tidyverse, foreach, fs, data.table, qs, glue)
 
 
-species <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP")
 #TODO::Ask TATI if these species were preselected and why
 speciesOfInterest <- c("NOWA", "FOSP", "HOLA", "OSFL", "PISI", "SWSP", "TEWA", "WEWP", 
                        "WWCR", "ATSP", "BOCH", "COYE", "CAWA", "REVI", "WCSP")
 
 #complete list of species from google drive
-species <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP", "ATTW", "BARS", "BAWW",
-              "BBWA", "BBWO", "BCCH", "BHCO", "BHVI", "BLPW", "BOCH", "BRBL",
-              "BRCR", "BTNW", "CAWA", "CCSP", "CHSP", "CONW", "CORA", "COYE",
-              "DEJU", "EAKI", "EVGR", "FOSP", "GCKI", "GCTH", "GRAJ", "HAFL",
-              "HETH", "HOLA", "LCSP", "LEFL", "LEYE", "LISP", "MAWA", "NOFL",
-              "NOWA", "OCWA", "OSFL", "OVEN", "PAWA", "PHVI", "PISI", "PIWO",
-              "PUFI", "RBGR", "RBNU", "RCKI", "REVI", "RUBL", "RUGR", "RWBL",
-              "SAVS", "SOSP", "SWSP", "SWTH", "TEWA" ,"TRES", "VATH", "WAVI",
-              "WCSP", "WETA", "WEWP", "WIWA", "WIWR", "WTSP", "WWCR", "YBFL",
-              "YBSA", "YEWA", "YRWA")
+species <- c("ALFL", "AMCR", "AMRE", "AMRO", "ATSP", "ATTW", "BAWW", "BBWA", 
+             "BBWO", "BCCH", "BHCO", "BHVI", "BLPW", "BOCH", "BRBL", "BRCR",
+             "BTNW", "CAWA", "CCSP", "CHSP", "CONW", "CORA", "COYE", "DEJU", 
+             "EAKI", "EVGR", "FOSP", "GCKI", "GCTH", "GRAJ", "HAFL", "HETH",
+             "HOLA", "LCSP", "LEFL", "LEYE", "LISP", "MAWA", "NOWA", "OCWA", 
+             "OSFL", "OVEN", "PAWA", "PHVI", "PISI", "PUFI", "RBGR", "RBNU", 
+             "RCKI", "REVI", "RUBL", "RUGR", "RWBL", "SAVS", "SOSP", "SWSP", 
+             "SWTH", "TEWA" ,"TRES", "VATH", "WAVI", "WCSP", "WETA", "WEWP", 
+             "WIWA", "WIWR", "WTSP", "WWCR", "YBFL", "YBSA", "YEWA", "YRWA")
 
 gcm<- paste(c('CanESM2', 'CCSM4', 'INM-CM4'), collapse = '|')  #There are other two options for GCM: 'CanESM2', 'CCSM4' and 'INM-CM4'
 years <- paste(c(2011, 2031,2051,2071,2091, 2100), collapse = "|")
@@ -60,9 +58,8 @@ birdPredictions <- downloadPredRas(folderUrl= "1O34zQIem_RUxxCDOZMGEUPIkUtCWsS_c
 birdPred <- loadBirdPredictions(birdList = species,
                                 pathData = pathData
                                 )
-meanStack <- loadMeanRas(species = species,
-                         pathData = pathData,
-                         pattern = 'mean')
+meanStack <- loadMeanRas(species =  species, pattern = 'mean',
+                         pathData = pathData)
 occStack <- loadOccRas(species = species,
                          pathData = pathData,
                          pattern = 'occu')
