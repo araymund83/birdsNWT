@@ -11,22 +11,24 @@ thrs <- read_csv('./inputs/prevOcc.csv')
 root <- './outputs'
 dirs <- fs::dir_ls(root, type = 'directory')
 spcs <- basename(dirs)
+spcs <- spcs[1:72]
 dirs <- glue('{dirs}/occur')
 dirs <- as.character(dirs)
+dirs <- dirs[1:72]
 
 # See the changes  --------------------------------------------------------
 raster_to_table <- function(spc){
   
   # Proof
-  spc <- spcs[2] # Run and comment (after)
+  #spc <- spcs[2] # Run and comment (after)
   cat('Start ', spc, '\n')
   dir <- grep(spc,dirs, value = TRUE)
-  fls <- list.files(dir, pattern = 'occu', full.names = TRUE)
+  fls <- list.files(dir, pattern = '6.25', full.names = TRUE)
   fls <- grep('occu', fls, value = TRUE)
   yrs <- parse_number(basename(fls))
   yrs <- unique(yrs)
   yrs <- na.omit(yrs)
-  gcm <- str_sub(basename(fls), start = 16, end = nchar(basename(fls)) - 4)
+  gcm <- str_sub(basename(fls), start = 16, end = nchar(basename(fls)) - 9)
   gcm <- unique(gcm)
   #thr <- filter(thrs, spec == spc)
  # vle <- unique(thr$pOccMean)
@@ -52,8 +54,7 @@ raster_to_table <- function(spc){
   
   rsl <- bind_rows(dfm)
   #browser
-  #fst::write_fst(x = rsl, path = glue('./outputs/{spc}/tbl_yrs_{spc}.fst')) ## saving with .fst creates very big files! 
-  qs::qsave(x = rsl, file = glue('./outputs/{spc}/occur/occ_yrs_{spc}.qs'))
+  qs::qsave(x = rsl, file = glue('./outputs/{spc}/occur/occ_yrs_{spc}_625.qs'))
   
   cat('------- Done -------\n')
   return(rsl)

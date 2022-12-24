@@ -40,7 +40,7 @@ dssl <- inner_join(dssl, znes, by = c('value' = 'value'))
 # Function ----------------------------------------------------------------
 get_max_min <- function(fle){
   
-  #fle <- fles[1]
+  fle <- fles[1]
   cat('Start\n')
   spc <- str_sub(basename(fle), 1, 4)
   qst <- qs::qread(fle)
