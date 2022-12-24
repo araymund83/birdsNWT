@@ -13,6 +13,6 @@ prev<- read.csv('./inputs/prevalanceSpp.csv')  # this file was provided by
 ## Diana Stralberg
 
 prev<- prev |> rowwise()|> 
-  mutate(pOccMean = 1- dpois(x = 0, lambda = meandens),
-         pOccMed = 1 -dpois(x = 0, lambda = meddens))
-write.csv(prev, './inputs/prevOcc.csv', row.names = FALSE)
+  mutate(pOccMean = 1- dpois(x = 0, lambda = meandens * 6.25),
+         pOccMed = 1 -dpois(x = 0, lambda = meddens * 6.25))
+write.csv(prev, './inputs/prevOcc625.csv', row.names = FALSE)

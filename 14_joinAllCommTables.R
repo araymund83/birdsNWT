@@ -42,10 +42,5 @@ join_tble <- function(gcm){
 # Apply this function -------------------------------------------------------
 map(.x = gcms, .f = join_tble)
 
-CanESM2 <- qs::qread('./tables/qs/comm/commAllSpp_CanESM2.qs')
-traits <- reproducible::prepInputs(url = 'https://drive.google.com/file/d/1etzpvt3Y4Z5ct4y3avTJORM-QVLtXsYd/view?usp=sharing',
-                                   targetFile = 'birdSpecies_traits.csv',
-                                   destinationPath = paths$inputPath,
-                                   fun = data.table::fread)
 
 

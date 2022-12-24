@@ -17,7 +17,7 @@ spcs <- dir_ls(root)
 # Make difference ---------------------------------------------------------
 make_community <- function(spc){
   
-  #spc <- spcs[1]
+  spc <- spcs[1]
   
   cat('Start ', spc, '\n')
   fls <- dir_ls(grep(spc, spcs, value = TRUE))

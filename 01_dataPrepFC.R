@@ -17,7 +17,7 @@ print(spcs)
 
 # Making an example for one specie ----------------------------
 make_average_reps <- function(sp){
-  sp <- spcs[14]
+  #sp <- spcs[14]
   cat('Start\n', sp, '\n')
   fls <- fs::dir_ls(sp) #lista archivos
   dir <- sp # directorio de trabajo

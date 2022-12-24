@@ -1,7 +1,8 @@
 # Load libraries --------------------------------------------------------
 require(pacman)
 
-pacman::p_load(raster, rgdal, rgeos, terra, stringr, glue, sf, tidyverse, RStoolbox, fs, fst, spatialEco)
+pacman::p_load(raster, rgdal, rgeos, terra, stringr, glue, sf, tidyverse, RStoolbox,
+               fs, fst, spatialEco)
 
 g <- gc(reset = TRUE)
 rm(list = ls())
