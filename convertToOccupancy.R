@@ -24,7 +24,7 @@ get_probOcc <- function(spc){
  #spc <- spcs[1] # Run and erase
   dir <- grep(spc, dirs, value = TRUE)
   fls <- fs::dir_ls(dir, regexp = '.tif$')
-  fls <- fls <- grep('mean', fls, value = TRUE)
+  fls <- grep('mean', fls, value = TRUE)
   yrs <- parse_number(basename(fls))
   yrs <- unique(yrs)
   yrs <- yrs[2:7]
@@ -38,22 +38,16 @@ get_probOcc <- function(spc){
     fl <- grep(gcm[k], fls, value = TRUE)
     fl <- as.character(fl)
     stk <- raster::stack(fl)
-    cellArea = 6.25
-   # dps <- calc(x = stk, fun = function(pxl){1- dpois(x = 0, lambda = pxl * cellArea)}) # multiply for cell area to produce poccurrence at cell level
-    #names(dps)<- yrs
-    #ou <- glue('./outputs/{spc}/occur/occu_{spc}_{gcm}_6.25.tif')
-    #dr <- dirname(name)
-    #writeRaster(x = dps, filename = ou[k], overwrite = TRUE )
-
+  
     proOccRas<-  map(.x = 1:length(yrs), .f = function(yr){
       message(crayon::green('Year', yrs[yr]))
       sfl <- grep(yrs[yr], fl, value = TRUE)
       rst <- raster::raster(sfl)
-      dps <- calc(x = rst, fun = function(pxl){1- dpois(x = 0, lambda = pxl * cellArea)})
-      out <- glue('./outputs/{spc}/occur')
+      dps <- calc(x = rst, fun = function(pxl){1- dpois(x = 0, lambda = pxl * pi)})
+      out <- glue('./outputs/{spc}/occurpi')
       ifelse(!dir.exists(out), dir.create(out, recursive = TRUE), print('Folder already exist'))
       writeRaster(x = dps, 
-                  filename = glue('./outputs/{spc}/occur/occu_{spc}_{yrs[yr]}_{gcm[k]}_6.25.tif'),
+                  filename = glue('{out}/occu_{spc}_{yrs[yr]}_{gcm[k]}_pi.tif'),
                   overwrite = TRUE)
       cat('Done!\n')
    })
