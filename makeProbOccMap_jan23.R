@@ -2,7 +2,7 @@
 require(pacman)
 pacman::p_load(parallel, foreach, doSNOW,raster, rgdal, rgeos, reproducible, RColorBrewer, ggspatial, 
                ggpubr, gridExtra, stringr, glue, sf, tidyverse, fasterize,
-               RStoolbox, fs, fst, trend, colorspace, hrbrthemes,exactextractr, furrr, future, spatialEco)
+               fs, fst, trend, colorspace, hrbrthemes,exactextractr, furrr, future, spatialEco)
 
 g <- gc(reset = TRUE)
 rm(list = ls())
@@ -17,6 +17,7 @@ ecrg <- sf::st_read('inputs/ecoregions/NWT_ecoregions_dissolvec.shp')
 
 targetCRS <- paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
                    "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")
+spName <- read.csv('./inputs/SppNames.csv') 
 
 # Extract by mask for the ecoregions ---------------------------------------
 plot(st_geometry(ecrg))
@@ -40,13 +41,15 @@ make_changesMap_pOcc <- function(spc, yr1, yr2){
  tbl <- mutate(tbl, avg = rowMeans(tbl[,4:9]))
  tbl <- as_tibble(tbl)
  gcm <- unique(tbl$gc)
+ name<- filter(spName, species == spc)
   
  message(crayon::green(glue('Estimating change from {yr1} to {yr2} year\n')))
- tbl <- mutate(tbl, change = tbl$y2031 - tbl$y2011)  #change 2100 for 2091
+ tbl <- mutate(tbl, change = tbl$y2031 - tbl$y2011)  #change 2100 for 2031
  tbl <- mutate(tbl, perctChange = ((tbl$y2031- tbl$y2011) / tbl$y2011) * 100) # use if you want to calculate the percent change from baselinea
  tbl <- mutate(tbl, ratio = tbl$y2031/tbl$y2011)
  tbl <- mutate(tbl, logRatio = log2(ratio))
  tbl <- mutate(tbl, gc = as.factor(gc))
+ tbl <- full_join(tbl, name, by = c('specie'= 'species'))
  out <- glue('./qs/occurpi/')
  ifelse(!dir.exists(out), dir.create(out, recursive = TRUE), print('Folder already exist'))
  qs::qsave(x = tbl, file = glue('{out}/occur_changes_{yr1}-{yr2}_{spc}.qs'))
@@ -60,11 +63,12 @@ make_changesMap_pOcc <- function(spc, yr1, yr2){
    #                       na.value = '#999999',breaks = breaks,limits = c(-1, 1) * max(abs(tbl$change))) +
    scale_colour_gradientn(colours = brewer.pal(n = 10, name = 'BrBG'), limit = c(-1,1))+#limit = c(-1, 1) * max(abs(tbl$change)))+
    facet_wrap(. ~ gc, ncol = 3, nrow = 1) +
-   ggtitle(label = glue('{spc} ({yr1}-{yr2})')) +
+   ggtitle(label = glue('{name} ({spc})'), subtitle = glue('{yr1}-{yr2}')) +
    theme_bw() +
    theme(legend.position = 'bottom', 
          legend.key.width = unit(4, 'line'),
          plot.title = element_text(size = 16, face = 'bold', hjust = 0, vjust = 0.7), 
+         plot.subtitle = element_text(size = 14, hjust = 0, vjust = 0.7),
          axis.title = element_text(size = 14),
          axis.text.x = element_text(size = 12), 
          axis.text.y = element_text(size = 12), 
@@ -72,14 +76,14 @@ make_changesMap_pOcc <- function(spc, yr1, yr2){
          legend.title = element_text(size = 12, face = 'bold'), 
          strip.text = element_text(size =12)) +
    labs(x = 'Longitude', y = 'Latitude', fill = 'Change')
- out <- glue('./maps/occurpi/changes/') 
+ out <- glue('./maps/occurpi2/changes_{yr1}-{yr2}/') 
  ifelse(!dir.exists(out), dir.create(out, recursive = TRUE), 'Folder already exist')
  ggsave(plot = ggRatio,filename = glue('{out}/ocurr_change_{yr1}-{yr2}_{spc}.png'),
-        units = 'in', width = 12, height = 9, dpi = 700)
+        units = 'in', width = 11, height = 8, dpi = 300)
 }
 
 # Apply the function -----------------------------------------------------
-purrr::map(.x= spcs[71:72], '2011', '2031', .f = make_changesMap_pOcc)
+purrr::map(.x= spcs, yr1 ='2011', yr2 = '2031', .f = make_changesMap_pOcc)
 
 # Apply the function ------------------------------------------------------
 
