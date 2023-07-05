@@ -56,3 +56,5 @@ get_probOcc <- function(spc){
 
 # Apply the function ------------------------------------------------------
 map(.x = spcs, .f = get_probOcc)
+
+
