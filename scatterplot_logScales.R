@@ -1,4 +1,4 @@
-abundance<- qs::qread( './tables/totalAbundance.qs')
+abundance<- qs::qread('./tables/totalAbundance.qs')
 abundance <- abundance %>% filter(specie != 'BARS' & specie != 'NOFL', specie != 'PIWO')
 #abundance <- abundance %>% filter(gcm != 'baseline')
 #abundance <- abundance %>%  select(specie, year, gcm, total, log2Ratio)
@@ -29,6 +29,7 @@ make_graph <- function(data){
       ungroup() |> 
       mutate(corr = round(corr, 2))
     
+    data_sub = data[which(data$log2ratio >0.58), ]
     
     cat('Making the correlation graph\n')
     
@@ -55,8 +56,8 @@ make_graph <- function(data){
                          breaks = trans_breaks('log2', function(x) 2^x),
                          labels = trans_format('log2', math_format(2^.x))) +
       scale_y_continuous(trans =log_trans(),
-                         breaks = trans_breaks('log2', function(x) 2^x),
-                         labels = trans_format('log2', math_format(2^.x)))+
+                         breaks = scales::trans_breaks('log2', function(x) 2^x),
+                         labels = scales::trans_format('log2', math_format(2^.x)))+
       # geom_abline(intercept = 0, slope = exp(.05), colour = 'green', linetype = 'dashed') + #decrease of half with log10
       # geom_abline(intercept = 0, slope = exp(-0.05), colour = 'red', linetype = 'dashed') + # increase of 1.5 with log10
       # geom_abline(intercept = 0, slope = 1, colour = 'black') + # increase of 1.5
@@ -86,7 +87,7 @@ make_graph <- function(data){
     
     
     ggsave(plot = gsct, 
-           filename = glue('./graphs/figs/scatter/abun2011_2091_2scalefixsep2022_log2_{gcm[gc]}.png'),  ## the notation is not scientific
+           filename = glue('./graphs/figs/scatter/abun2011_2091_2scalefixapril2023_log2_{gcm[gc]}.png'),  ## the notation is not scientific
            units = 'in', width = 12, height = 9, dpi = 700)
     
     return(gsct)
