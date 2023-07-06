@@ -67,6 +67,6 @@ get_diff <- function(spc){
   return(rsl)
   }
 ### Raster to table ---------------------------------------------------------
-dfrm <- map(.x = spcs, .f = get_diff)
+dfrm <- map(.x = spcs[59], .f = get_diff)
 dim(dfrm)
 object.size(dfrm)

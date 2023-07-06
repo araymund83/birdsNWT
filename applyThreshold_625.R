@@ -78,7 +78,7 @@ test <- qs::qread(fles[1])
 dout <- './graphs/figs/occur'
 
 # Function table to raster ------------------------------------------------
-tbl2rst <- function(fle){
+tbl2rst <- function(fle, yr1, yr1){
   
   #fle <- fles[1] # Run and erase (after)
   cat('Start ', basename(fle), '\n')

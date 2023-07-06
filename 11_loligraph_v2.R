@@ -7,7 +7,7 @@ pacman::p_load(glue, raster, rgdal, rgeos, readxl, stringr, sf, R.filesets,
 rm(list = ls())
 
 # Load data ---------------------------------------------------------------
-change <- qs::read('../tables/yr_changeTables.qs')
+change <- qs::qread('./tables/yr_changeTable.qs')
 
 # Testing -----------------------------------------------------------------
 subd <- filter(change, species == sp)
