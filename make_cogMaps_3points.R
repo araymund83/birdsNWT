@@ -1,24 +1,33 @@
 # Load libraries  ---------------------------------------------------------
 library(pacman)
 p_load( dplyr,fs, ggplot2, glue,qs,sf,tidyverse)
+g <- gc(reset = TRUE)
+rm(list = ls())
+
+# Load data ---------------------------------------------------------------
+root <- './outputs'
+dirs <- fs::dir_ls(root, type = 'directory')
+spcs <- basename(dirs)
+spcs <- spcs[1:72]
 
 # Read all COG tables  ----------------------------------------------------
 read_table <- function(specie){
-  # specie <- spcs[2]
+  #specie <- spcs[1]
   message(crayon::blue('Starting\n', specie, '\n'))
-  path <- glue('./tables/coG/Reclass')
-  table <- qs::qread(file = glue('{path}/{specie}_coG_reclass.qs'))
+  path <- glue('./tables/coGpi')
+  table <- qs::qread(file = glue('{path}/{specie}_coGpi.qs'))
   cat('Done \n')
   return(table)
 }  
 # Apply the function ------------------------------------------------------
-coG_Table <- map(.x = spcs, .f = read_table)
-coG_dist_all_Table <- bind_rows(distCogTable)  
-
-
+# coG_Table <- map(.x = spcs, .f = read_table)
+# coG_dist_all_Table <- bind_rows(coG_Table)  
+# 
+# 
 out <-'./tables/distBear_coGpi'
-ifelse(!dir.exists(out), dir.create(out, recursive = TRUE), print('Folder already exist'))
-qs::qsave(coG_dist_all_Table, glue('{out}/coGpiDistBearTable_allsp.qs'))
+# ifelse(!dir.exists(out), dir.create(out, recursive = TRUE), print('Folder already exist'))
+# qs::qsave(coG_dist_all_Table, glue('{out}/coGpiDistBearTable_allsp.qs'))
+
 
 
 limt <- sf::st_read('inputs/NT1_BCR6/NT1_BCR6_poly.shp') 
@@ -27,14 +36,14 @@ ecrg <- sf::st_read('inputs/ecoregions/NWT_ecoregions_dissolvec.shp')
 
 targetCRS <- paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
                    "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")
-cogTable <-  qs::qread(file = glue('./tables/coGpi/coGpiTable_allsp.qs'))
+cogTable <-  qs::qread(file = glue('./tables/coGpiTable_allsp.qs'))
 cogDF <- st_as_sf(cogTable, coords = c('COGx','COGy'), crs = targetCRS)
 
-cogDistTable <-qs::qread(file = glue('tables/distBear_coGpi/coGpiDistBearTable_allsp.qs'))
-YRWA <- qs::qread(file = glue('tables/distBear_coGpi/YRWA_distBear_coGpi.qs'))
+cogDistTable <-qs::qread(file = glue('tables/coGpiDistBearTable_72allsp.qs'))
+#YRWA <- qs::qread(file = glue('tables/distBear_coGpi/YRWA_distBear_coGpi.qs'))
 
 coG_Map <- function(spc){
- # spc <- spcs[22] # Run and comment (after)
+  spc <- spcs[22] # Run and comment (after)
   message(crayon::green('Files for specie', spc))
   dir <- glue('./outputs/{spc}/occurpi')
   #dir <- grep(spc, dirs, value = TRUE)
@@ -47,8 +56,8 @@ coG_Map <- function(spc){
     message(crayon::green('Loading files for', gcm[k]))
     fl <- grep(gcm[k], fls, value = TRUE)
     fl <- as.character(fl)
-    cogYrs <-  map(.x = 1:length(yrs), .f = function(yr){
-      #message(crayon::green('Year', yrs[yr]))
+    cogYrs <-  map(.x = 3:length(yrs), .f = function(yr){
+      message(crayon::green('Year', yrs[yr]))
       sfl <- grep(yrs[yr], fl, value = TRUE)
       rst <- terra::rast(sfl) 
       tbl <- as.data.frame(rst, xy= TRUE) %>% 
@@ -91,11 +100,11 @@ coG_Map <- function(spc){
               legend.title = element_text(size = 12, face = 'bold'), 
               #text = element_text(size = 10, color = 'gray'),
               strip.text = element_text(size = 12)) +
-        labs(x = 'Longitude', y = 'Latitude', fill = 'pOcc')
+        labs(x = 'Longitude', y = 'Latitude', fill = 'Probability of Occurrence')
      
-      out <- glue('./maps/cogPi') 
-      ifelse(!dir.exists(out), dir.create(out, recursive = TRUE), print('Folder already exist'))
-      ggsave(plot = ggCOG,filename = glue('{out}/cogPi_{spc}_{gcm[k]}_{yrs[yr]}.png'),
+      out <- glue('./maps/cogPi2') 
+     # ifelse(!dir.exists(out), dir.create(out, recursive = TRUE), print('Folder already exist'))
+      ggsave(plot = ggCOG,filename = glue('{out}/cogPi_{spc}_{gcm[k]}_{yrs[yr]}2.png'),
              units = 'in', width = 12, height = 9, dpi = 700 )
     })
     
@@ -105,5 +114,5 @@ coG_Map <- function(spc){
 }
 
 # Apply the function ------------------------------------------------------
-cogMaps <- map(.x = spcs[72], .f = coG_Map)
+cogMaps <- map(.x = spcs, .f = coG_Map)
 

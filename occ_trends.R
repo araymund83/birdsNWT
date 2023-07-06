@@ -1,3 +1,4 @@
+#This script converts the occurrence rasters to a table 
 # Load libraries --------------------------------------------------------
 require(pacman)
 
@@ -12,7 +13,7 @@ root <- './outputs'
 dirs <- fs::dir_ls(root, type = 'directory')
 spcs <- basename(dirs)
 spcs <- spcs[1:72]
-dirs <- glue('{dirs}/occur')
+dirs <- glue('{dirs}/occurpi')
 dirs <- as.character(dirs)
 dirs <- dirs[1:72]
 
@@ -20,51 +21,41 @@ dirs <- dirs[1:72]
 raster_to_table <- function(spc){
   
   # Proof
-  #spc <- spcs[2] # Run and comment (after)
-  cat('Start ', spc, '\n')
+  #spc <- spcs[6] # Run and comment (after)
+  message(crayon::green("Starting with:", spc))
   dir <- grep(spc,dirs, value = TRUE)
-  fls <- list.files(dir, pattern = '6.25', full.names = TRUE)
-  fls <- grep('occu', fls, value = TRUE)
+  fls <- list.files(dir, pattern = 'pi', full.names = TRUE)
   yrs <- parse_number(basename(fls))
   yrs <- unique(yrs)
   yrs <- na.omit(yrs)
-  gcm <- str_sub(basename(fls), start = 16, end = nchar(basename(fls)) - 9)
+  gcm <- str_sub(basename(fls), start = 16, end = nchar(basename(fls)) - 7)
   gcm <- unique(gcm)
-  #thr <- filter(thrs, spec == spc)
- # vle <- unique(thr$pOccMean)
-  
+
   cat('Raster to table\n')
   dfm <- map(.x = 1:length(gcm), .f = function(k){
     
     cat(gcm[k], '\n')
     fl <- grep(gcm[k], fls, value = TRUE)
-    cat('----- Terra library functions -----\n')
-    tr <- terra::rast(fl)
-    tb <- terra::as.points(tr)
-    df <- terra::as.data.frame(x = tb)
-    names(df) <- paste0('y', yrs)
-    
-    gm <- terra::geom(tb)
-    df <- cbind(gm[,3:4], df)
+    rs <- terra::rast(fl)
+    df <- terra::as.data.frame(x = rs ,xy = TRUE, na.rm = TRUE)
+    colnames(df)[3:8]<- glue('y{yrs}')
     df <- as_tibble(df)
-    df <- mutate(df, gc = gcm[k])
+    df <- df %>% mutate(gc = gcm[k],
+                        specie = spc)
     return(df)
     
   })
   
   rsl <- bind_rows(dfm)
-  #browser
-  qs::qsave(x = rsl, file = glue('./outputs/{spc}/occur/occ_yrs_{spc}_625.qs'))
+  out<- glue ('./qs/occurpi')
+  ifelse(!dir.exists(out), dir.create(out, recursive = TRUE), print('Dir already exists'))
+  qs::qsave(x = rsl, file = glue('{out}/occ_yrs_{spc}_pi.qs'))
   
   cat('------- Done -------\n')
   return(rsl)
   
 }
 ### Raster to table ---------------------------------------------------------
-dfrm <- map(.x = spcs, .f = raster_to_table)
+dfrm <- map(.x = spcs[57:72], .f = raster_to_table)
 
-dim(dfrm)
-object.size(dfrm)
 
-## to read qs
-table<- qs::qread(file = glue('./outputs/{spc}/tbl_yrs_{spc}.qs'))

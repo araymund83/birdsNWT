@@ -12,6 +12,7 @@ thrs <- read_csv('./inputs/prevOcc.csv')
 root <- './outputs'
 dirs <- fs::dir_ls(root, type = 'directory')
 spcs <- basename(dirs)
+spcs <- spcs[1:72]
 dirs <- glue('{dirs}/occur')
 dirs <- as.character(dirs)
 
@@ -21,6 +22,7 @@ ecrg <- sf::st_read('inputs/ecoregions/NWT_ecoregions_dissolvec.shp')
 
 targetCRS <- paste("+proj=lcc +lat_1=49 +lat_2=77 +lat_0=0 +lon_0=-95",
                    "+x_0=0 +y_0=0 +units=m +no_defs +ellps=GRS80 +towgs84=0,0,0")
+spName <- read.csv('./inputs/SppNames.csv') 
 
 # Extract by mask for the ecoregions ---------------------------------------
 plot(st_geometry(ecrg))
@@ -76,7 +78,7 @@ calcChange_rasters <- function(spc){
     labs(x = 'Longitude', y = 'Latitude', fill = 'Change')
   
   ggsave(plot = ggRatio,filename = glue('./graphs/maps/ratio/ocurr_july2022/occ_change91-11_{spc}.png'),
-         units = 'in', width = 12, height = 9, dpi = 700)
+         units = 'in', width = 12, height = 9, dpi = 300)
  }
 
 # Apply the function -----------------------------------------------------
